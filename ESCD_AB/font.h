@@ -3,18 +3,17 @@
 
 #define FONT_OFFSET               48
 
-//the font is used as a reference only.
-//To get the code as small as possible,
-//we only use 32 different 1x8 bitmaps.
-//so only 32 bytes to create all letters and numbers.
-//the bitmap is called letterPartsNew[] in bitmaps.h
-//this means each letter is now 3 bytes.
-//the textBox[] can max hold 120 of this letter parts
-//or 40 characters.
+// font[] is a 1x8 sprite sheet AND the glyph dictionary.
+// bytes 0,1 = width,height for drawSelfMasked
+// frame 0   = blank (spaces / 4th column gap stay 0 in charBox)
+// frame 1+  = 3 column bitmaps per character, starting at ASCII 48
+// charBox[] stores FRAME indexes, not the column pixels.
 
-PROGMEM const unsigned char font[] = //... bytes if we would use the font as a bitmap.
+PROGMEM const unsigned char font[] =
 {
-// 0  -  ASCII DEC 48 ; HEX 30
+  1, 8,
+  0,   // frame 0 = empty column
+// 0  -  ASCII DEC 48 ; HEX 30   frames 1,2,3
 0B00011111,
 0B00010001,
 0B00011111,

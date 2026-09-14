@@ -405,7 +405,7 @@ void drawTicker(byte setTicker)
     {
       for (byte z = 0; z < 2; z++)
       {
-        sprites.drawSelfMasked(x, currentRoomY + 38 - y, letterPartsNew, charBox[x]);
+        sprites.drawSelfMasked(x, currentRoomY + 38 - y, font, charBox[x]);
         x++;
       }
       (w < 29) ? y++ : y--;
@@ -595,12 +595,9 @@ void drawNumbers(byte x, byte y, unsigned long numbers, byte width)
   {
     byte digit = buf[i] - '0';
     if (digit > 9) digit = 0;
-    uint16_t fo = (uint16_t)digit * 3;
+    byte fr = digit * 3 + 1;
     for (byte c = 0; c < 3; c++)
-    {
-      byte col = pgm_read_byte(&font[fo + c]);
-      sprites.drawSelfMasked(x + (4 * i) + c, y, letterPartsNew, col);
-    }
+      sprites.drawSelfMasked(x + (4 * i) + c, y, font, fr + c);
   }
 }
 

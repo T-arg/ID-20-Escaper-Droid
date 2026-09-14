@@ -82,14 +82,12 @@ void loadAndFillMessage(uint8_t indexMessage)
     if (c == 0) break;   // end of string
 
     uint8_t idx = c - FONT_OFFSET;
-    if (idx == 240) idx = 255;   // treat as blank (already zeroed)
-
-    if (idx != 255)
+    if (idx != 240)              // space → leave zeros = frame 0 blank
     {
-      uint16_t fontOffset = (uint16_t)idx * 3;
-      charBox[pos    ] = pgm_read_byte(&font[fontOffset    ]);
-      charBox[pos + 1] = pgm_read_byte(&font[fontOffset + 1]);
-      charBox[pos + 2] = pgm_read_byte(&font[fontOffset + 2]);
+      byte fr = idx * 3 + 1;     // skip header; frame 0 is blank
+      charBox[pos    ] = fr;
+      charBox[pos + 1] = fr + 1;
+      charBox[pos + 2] = fr + 2;
     }
 
     pos += 4;            // advance by one glyph (4 bytes) adding a spacing between characters
@@ -120,14 +118,12 @@ void addNumber(unsigned long number, byte charIndex, byte amountLeadingZeros)
     uint8_t digit = number % 10;
     number /= 10;
 
-    uint8_t idx = (digit + '0') - FONT_OFFSET;
-    uint16_t fontOffset = (uint16_t)idx * 3;
-
     if (writePos + 2 < sizeof(charBox))
     {
-      charBox[writePos    ] = pgm_read_byte(&font[fontOffset    ]);
-      charBox[writePos + 1] = pgm_read_byte(&font[fontOffset + 1]);
-      charBox[writePos + 2] = pgm_read_byte(&font[fontOffset + 2]);
+      byte fr = digit * 3 + 1;
+      charBox[writePos    ] = fr;
+      charBox[writePos + 1] = fr + 1;
+      charBox[writePos + 2] = fr + 2;
     }
 
     writePos -= 4;   // previous character
