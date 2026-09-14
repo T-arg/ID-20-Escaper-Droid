@@ -212,6 +212,9 @@ void ATMsynth::playSfx(const byte *track, byte ch) {
     TCCR4C = 0b01000101;
     OCR4D  = 0x80;
 #endif
+    // no score loaded: do not fetch song commands from ptr == 0
+    atmScorePaused = 1;
+    ChannelActiveMute = 0b11110000;
   }
 
   if (sfxOsc < 4 && sfxOsc != ch)
@@ -498,7 +501,7 @@ void ATM_playroutine() {
         }
         ChannelActiveMute = 0b11110000;
       }
-      else
+      else if (sfxOsc >= 4)
       {
         memset(channel, 0, sizeof(channel));
         TIMSK4 = 0; // Disable interrupt

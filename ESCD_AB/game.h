@@ -118,7 +118,7 @@ void stateGameOver()
   drawPlayer();
   if (arduboy.justPressed(A_BUTTON | B_BUTTON))
   {
-    ATM.play(menuSong);
+    playMenuMusic();
     statePrepForMainMenu();
   }
 }
@@ -128,7 +128,7 @@ void stateGameFinished()
   drawWalls();
   if (arduboy.justPressed(A_BUTTON | B_BUTTON)) 
   {
-    ATM.play(menuSong);
+    playMenuMusic();
     statePrepForMainMenu();
   }
 }

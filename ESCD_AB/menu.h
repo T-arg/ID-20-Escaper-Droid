@@ -16,28 +16,18 @@ void drawTitleScreen()
   drawWalls();
 }
 
-void checkSoundState(byte soundOrMusic)
+void checkSoundState(byte mode)
 {
-  switch (soundOrMusic)
-    {
-      case 0:
-        arduboy.audio.on();
-        soundFXOn = TRUE;
-        break;
-      case 1:
-        arduboy.audio.on();
-        soundFXOn = FALSE;
-        ATM.play(menuSong);
-        break;
-      case 2:
-        arduboy.audio.on();
-        soundFXOn = TRUE;
-        ATM.stop();
-        break;
-      case 3:
-        arduboy.audio.off();
-        break;
-    }
+  soundMode = mode;
+  if (mode == 3)
+  {
+    ATM.stop();
+    arduboy.audio.off();
+    return;
+  }
+  arduboy.audio.on();
+  ATM.play(menuSong);
+  if (mode >= 2) ATM.pause();   // SFX only: keep ISR, freeze score
 }
 
 byte tickerYAt(byte x)
@@ -69,7 +59,7 @@ void stateMenuIntro()
 {
   if (arduboy.everyXFrames(120))
   {
-    ATM.play(menuSong);
+    playMenuMusic();
     statePrepForMainMenu();
   }
   sprites.drawSelfMasked(49, 20, T_arg, 0);
@@ -101,8 +91,7 @@ void stateMenuMain()
     loadAndFillMessage(menuSelection + 1);
     if (gameState == STATE_MENU_SDFX)
     {
-      menuSelection = 0;
-      checkSoundState(menuSelection);
+      menuSelection = soundMode;
     }
     
   }
@@ -156,6 +145,7 @@ void stateMenuSdfx()
   if (arduboy.justPressed(A_BUTTON | B_BUTTON))
   {
     arduboy.audio.saveOnOff();
+    menuSelection = STATE_MENU_SELECT_SDFX;
     statePrepForMainMenu();
   }
 }

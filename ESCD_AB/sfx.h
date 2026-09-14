@@ -1,7 +1,11 @@
 #ifndef SFX_H
 #define SFX_H
 
-bool soundFXOn;
+// 0: music + SFX   1: music only   2: SFX only   3: mute
+byte soundMode = 0;
+
+#define SFX_DOOR    0
+#define SFX_PICKUP  1
 
 const uint8_t sfxDoorClosed[] PROGMEM = {
   ATM_VOL(63),
@@ -21,9 +25,9 @@ const uint8_t pickUp[] PROGMEM = {
   ATM_STOP_CHAN,
 };
 
-const unsigned char *const PROGMEM soundFX[] =
+const unsigned char * const PROGMEM soundFX[] =
 {
-  sfxDoorClosed,pickUp,
+  sfxDoorClosed, pickUp,
 };
 
 #endif

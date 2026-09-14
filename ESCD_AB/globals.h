@@ -102,7 +102,16 @@ void statePrepForRoom()
 
 void play_SFX(byte idSfx)
 {
-ATM.playSfx(pgm_read_word(&soundFX[idSfx]), 0);
+  if (soundMode & 1) return;   // 1 = music only, 3 = mute
+  const unsigned char *fx =
+    (const unsigned char *)pgm_read_word(&soundFX[idSfx]);
+  ATM.playSfx(fx, 1);          // ch1: leave song pulse on ch0
 }
+
+void playMenuMusic()
+{
+  if (soundMode < 2) ATM.play(menuSong);
+}
+
 
 #endif
