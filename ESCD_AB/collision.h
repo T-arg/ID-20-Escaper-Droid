@@ -45,6 +45,7 @@ void playerChecksAndOpensDoor(byte direction)
   }
   else
   {
+    play_SFX(0);
     loadAndFillMessage(7);
     setTicker = TEXT_BLINK;
     showTicker = TRUE;
@@ -61,6 +62,7 @@ void playerChecksAndOpensLevelDoor(byte direction)
   }
   else
   {
+    play_SFX(0);
     loadAndFillMessage(8);
     setTicker = TEXT_BLINK;
     showTicker = TRUE;
@@ -182,6 +184,7 @@ void checkObjectTypeAndAct()
     case PICKUP_BLACK_CARD:
       if (bitRead(player.assets,5) == 0)
       {
+        play_SFX(1);
         bitSet(player.assets,5);
         clearElement();
         scorePlayer += SCORE_BLACK_CARD;
@@ -190,12 +193,14 @@ void checkObjectTypeAndAct()
     case PICKUP_WHITE_CARD:
       if ((player.assets & 0b00011000) < 0b00011000)
       {
+        play_SFX(1);
         player.assets += 0b00001000;
         clearElement();
         scorePlayer += SCORE_WHITE_CARD;
       }
       break;
     case PICKUP_BATTERY:
+      play_SFX(1);
       if (player.life < 3)
       {
         player.life++;
@@ -209,6 +214,7 @@ void checkObjectTypeAndAct()
       }
       break;
     case PICKUP_BULLET:
+      play_SFX(1);
       if ((player.assets & 0b00000111) < 0b00000111)
       {
         player.assets++;
@@ -217,6 +223,7 @@ void checkObjectTypeAndAct()
       }
       break;
     case PICKUP_CHIP:
+      play_SFX(1);
       clearElement();
       scorePlayer += SCORE_CHIP;
       break;

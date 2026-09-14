@@ -85,6 +85,7 @@ void checkInputs()
         bitSet(player.characteristics, DROID_TRANSPORTING_AT_BIT_7);
         gameState = STATE_GAME_TRANSPORTING;
         usedAction = true;
+        ATM.playSfx(sfxDoorClosed, 1);
       }
       else if (objType > 5)
       {
@@ -94,6 +95,7 @@ void checkInputs()
         byte mask       = stageRoom[currentRoom].elementsInfluenced;
         stageRoom[targetRoom].elementsActive ^= mask;
         usedAction = true;
+        ATM.playSfx(sfxDoorClosed, 1);
       }
     }
 

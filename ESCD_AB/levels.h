@@ -270,7 +270,8 @@ const unsigned char PROGMEM level04[] =
   5, 0b00011110,
 };
 
-const unsigned char *levels[] =
+// pointer table in flash too — 2 bytes per level, no SRAM copy
+const unsigned char * const PROGMEM levels[] =
 {
   level00, level01, level02, level03, level04
 };

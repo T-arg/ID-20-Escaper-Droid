@@ -125,9 +125,12 @@ struct Room {
 Room stageRoom[MAX_AMOUNT_OF_ROOMS];
 
 // one PROGMEM lookup for the current 1-based level
+// levels[] is itself in PROGMEM, so first read the pointer, then the byte
 byte lvByte(byte idx)
 {
-  return pgm_read_byte(&levels[level - LEVEL_OFFSET][idx]);
+  const unsigned char *lv =
+    (const unsigned char *)pgm_read_word(&levels[level - LEVEL_OFFSET]);
+  return pgm_read_byte(lv + idx);
 }
 
 byte roomByte(byte roomNumber, byte offset)

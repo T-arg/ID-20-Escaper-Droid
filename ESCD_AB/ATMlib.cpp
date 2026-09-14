@@ -94,6 +94,9 @@ struct ch_t {
 
 ch_t channel[4];
 
+ch_t sfxV;
+uint8_t sfxOsc = 0xFF;
+
 uint16_t read_vle(const byte **pp) {
   word q = 0;
   byte d;
@@ -119,9 +122,8 @@ void ATMsynth::play(const byte *song) {
   atmCue = 0;
   atmScorePaused = 0;
   atmSfxMask = 0;
-  // Default waveforms: Ch0=PULSE, Ch1=SQUARE, Ch2=PULSE, Ch3=NOISE
-  // Initializes ATMsynth
-  // Sets sample rate and tick rate
+  sfxOsc = 0xFF;
+  // Defaults: Ch0=PULSE, Ch1=SQUARE, Ch2=SAW, Ch3=NOISE
   tickRate = 25;
   cia = 15625 / tickRate;
   // Sets up the ports, and the sample grinding ISR
@@ -160,28 +162,37 @@ void ATMsynth::stop() {
   atmCue = 0;
   atmScorePaused = 0;
   atmSfxMask = 0;
+  sfxOsc = 0xFF;
 }
 
 // Start grinding samples or Pause playback
 void ATMsynth::playPause() {
-  atmScorePaused ^= 1;
-  if (atmScorePaused) {
-    for (byte n = 0; n < 4; n++) {
-      if (!(atmSfxMask & (1 << n))) osc[n].vol = 0;
-    }
-  } else {
-    TIMSK4 |= 0b00000100;
+  if (atmScorePaused) resume();
+  else pause();
+}
+
+void ATMsynth::pause() {
+  if (atmScorePaused) return;
+  atmScorePaused = 1;
+  for (byte n = 0; n < 4; n++) {
+    if (!(atmSfxMask & (1 << n))) osc[n].vol = 0;
   }
+}
+
+void ATMsynth::resume() {
+  if (!atmScorePaused) return;
+  atmScorePaused = 0;
+  TIMSK4 |= 0b00000100;
 }
 
 // Toggle mute on/off on a channel, so it can be used for sound effects
 // So you have to call it before and after the sound effect
 void ATMsynth::muteChannel(byte ch) {
-  ChannelActiveMute += (1 << 0 );
+  ChannelActiveMute |= (uint8_t)(1 << ch);
 }
 
 void ATMsynth::unMuteChannel(byte ch) {
-  ChannelActiveMute &= (~(1 << 0 ));
+  ChannelActiveMute &= (uint8_t)(~(1 << ch));
 }
 
 void ATMsynth::playSfx(const byte *track, byte ch) {
@@ -203,29 +214,37 @@ void ATMsynth::playSfx(const byte *track, byte ch) {
 #endif
   }
 
-  memset(&channel[ch], 0, sizeof(channel[ch]));
-  channel[ch].ptr = track;
-  ChannelActiveMute |= (uint8_t)(1 << (ch + 4));
-  ChannelActiveMute &= (uint8_t)(~(1 << ch));
+  if (sfxOsc < 4 && sfxOsc != ch)
+    atmSfxMask &= (uint8_t)(~(1 << sfxOsc));
+  memset(&sfxV, 0, sizeof(sfxV));
+  sfxV.ptr = track;
+  sfxOsc = ch;
+  atmSfxMask = (uint8_t)(1 << ch);
   if (ch == 3) osc[3].freq = 0x0001;
-  atmSfxMask |= (uint8_t)(1 << ch);
 
   TIMSK4 |= 0b00000100;
 }
+
 
 
 __attribute__((used))
 void ATM_playroutine() {
   ch_t *ch;
 
-  // for every channel start working
+  for (byte pass = 0; pass < 2; pass++)
   for (byte n = 0; n < 4; n++)
   {
-    ch = &channel[n];
-
-    if (atmScorePaused && !(atmSfxMask & (1 << n))) {
-      osc[n].vol = 0;
-      continue;
+    byte out = 1;
+    if (pass == 0) {
+      ch = &channel[n];
+      if (atmScorePaused) {
+        if (!(atmSfxMask & (1 << n))) osc[n].vol = 0;
+        continue;
+      }
+      out = !(atmSfxMask & (1 << n));
+    } else {
+      if (sfxOsc != n) continue;
+      ch = &sfxV;
     }
 
     // Noise retriggering: reseed the LFSR (always osc[3].freq in the ISR)
@@ -390,10 +409,16 @@ void ATM_playroutine() {
               for (byte i = 0; i < 4; i++) channel[i].repeatPoint = pgm_read_byte(ch->ptr++);
               break;
             case 95: // Stop channel
-              ChannelActiveMute = ChannelActiveMute ^ (1 << (n + 4));
-              ch->vol = 0;
-              ch->delay = 0xFFFF;
-              atmSfxMask &= (uint8_t)(~(1 << n));
+              if (pass) {
+                ch->vol = 0;
+                ch->delay = 0xFFFF;
+                sfxOsc = 0xFF;
+                atmSfxMask &= (uint8_t)(~(1 << n));
+              } else {
+                ChannelActiveMute ^= (uint8_t)(1 << (n + 4));
+                ch->vol = 0;
+                ch->delay = 0xFFFF;
+              }
               break;
           }
         } else if (cmd < 224) {
@@ -449,7 +474,7 @@ void ATM_playroutine() {
       if (ch->delay != 0xFFFF) ch->delay--;
     }
 
-    if (!(ChannelActiveMute & (1 << n))) {
+    if (out && !(ChannelActiveMute & (1 << n))) {
 #if ATM_WAVE_CH3 == ATM_WAVE_NOISE
       if (n == 3) {
         osc[n].vol = ch->vol >> 1;
@@ -462,7 +487,7 @@ void ATM_playroutine() {
     }
     // if all channels are inactive, stop playing or check for repeat
     
-    if (!(ChannelActiveMute & 0xF0))
+    if (pass == 0 && !(ChannelActiveMute & 0xF0))
     {
       byte repeatSong = 0;
       for (byte j = 0; j < 4; j++) repeatSong += channel[j].repeatPoint;

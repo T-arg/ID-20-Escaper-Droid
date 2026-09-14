@@ -1,7 +1,7 @@
 #ifndef MENU_H
 #define MENU_H
 
-#define SET_THE_DANCERS_Y       6
+#define SET_THE_DANCERS_Y       ROOM_DRAWING_OFFSET + 9
 
 #include "globals.h"
 #include "room.h"
@@ -14,6 +14,30 @@ void drawTitleScreen()
 {
   if (currentRoomY == 0) currentRoomY = ROOM_DRAWING_OFFSET;
   drawWalls();
+}
+
+void checkSoundState(byte soundOrMusic)
+{
+  switch (soundOrMusic)
+    {
+      case 0:
+        arduboy.audio.on();
+        soundFXOn = TRUE;
+        break;
+      case 1:
+        arduboy.audio.on();
+        soundFXOn = FALSE;
+        ATM.play(menuSong);
+        break;
+      case 2:
+        arduboy.audio.on();
+        soundFXOn = TRUE;
+        ATM.stop();
+        break;
+      case 3:
+        arduboy.audio.off();
+        break;
+    }
 }
 
 byte tickerYAt(byte x)
@@ -63,6 +87,7 @@ void stateMenuMain()
 
   sprites.drawPlusMask(51, 9+SET_THE_DANCERS_Y, droid_plus_mask, 2+danceDroid);
 
+  // drawing the 4 enemies on the title screen a loop is not saving memory
   sprites.drawPlusMask(27, 21+SET_THE_DANCERS_Y, enemies_plus_mask, 6+danceDroid);
   sprites.drawPlusMask(3, 33+SET_THE_DANCERS_Y, enemies_plus_mask, 14+danceDroid);
   sprites.drawPlusMask(75, 21+SET_THE_DANCERS_Y, enemies_plus_mask, 2+danceDroid);
@@ -74,6 +99,12 @@ void stateMenuMain()
   {
     gameState = menuSelection + 1;
     loadAndFillMessage(menuSelection + 1);
+    if (gameState == STATE_MENU_SDFX)
+    {
+      menuSelection = 0;
+      checkSoundState(menuSelection);
+    }
+    
   }
 }
 
@@ -106,10 +137,22 @@ void stateMenuSdfx()
 {
   drawTitleScreen();
   drawFloor();
+  drawSelectedWordMask(pgm_read_byte(&menuWordX[menuSelection]));
   // " MUSIC SOUND       ON   OFF"  ON @ char 19 → x76, OFF @ char 24 → x96
-  drawSelectedWordMask(arduboy.audio.enabled() ? 76 : 96);
-  if (arduboy.justPressed(LEFT_BUTTON)) arduboy.audio.on();
-  if (arduboy.justPressed(RIGHT_BUTTON)) arduboy.audio.off();
+  //drawSelectedWordMask(arduboy.audio.enabled() ? 76 : 96);
+  //if (arduboy.justPressed(LEFT_BUTTON)) arduboy.audio.on();
+  //if (arduboy.justPressed(RIGHT_BUTTON)) arduboy.audio.off();
+  
+  if (arduboy.justPressed(RIGHT_BUTTON) && (menuSelection < 3))
+  {
+    menuSelection++;
+    checkSoundState(menuSelection);
+  }
+  if (arduboy.justPressed(LEFT_BUTTON) && (menuSelection > 0))
+  {
+    menuSelection--;
+    checkSoundState(menuSelection);
+  }
   if (arduboy.justPressed(A_BUTTON | B_BUTTON))
   {
     arduboy.audio.saveOnOff();

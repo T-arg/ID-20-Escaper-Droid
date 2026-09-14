@@ -57,7 +57,7 @@
 #define FALSE                        0
 #define TRUE                         1
 
-#define ROOM_DRAWING_OFFSET          -3
+#define ROOM_DRAWING_OFFSET          -6
 
 // globals ///////////////////////////////////////////////////////////////////
 
@@ -100,5 +100,9 @@ void statePrepForRoom()
   gameState = STATE_GAME_PLAYING;
 }
 
+void play_SFX(byte idSfx)
+{
+ATM.playSfx(pgm_read_word(&soundFX[idSfx]), 0);
+}
 
 #endif

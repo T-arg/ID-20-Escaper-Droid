@@ -13,7 +13,10 @@
 #define ATM_WAVE_SQUARE 1
 #define ATM_WAVE_NOISE  2
 #define ATM_WAVE_SAW    3
-#define ATM_WAVE_TRI    4
+#define ATM_WAVE_OFF    255
+#endif
+#ifndef ATM_WAVE_OFF
+#define ATM_WAVE_OFF    255
 #endif
 #ifndef ATM_WAVE_CH0
 #define ATM_WAVE_CH0 ATM_WAVE_PULSE
@@ -22,7 +25,7 @@
 #define ATM_WAVE_CH1 ATM_WAVE_SQUARE
 #endif
 #ifndef ATM_WAVE_CH2
-#define ATM_WAVE_CH2 ATM_WAVE_PULSE
+#define ATM_WAVE_CH2 ATM_WAVE_SAW
 #endif
 #ifndef ATM_WAVE_CH3
 #define ATM_WAVE_CH3 ATM_WAVE_NOISE
@@ -50,6 +53,8 @@ class ATMsynth {
 
     void play(const byte *song);
     void playPause();
+    void pause();
+    void resume();
     void stop();
     void muteChannel(byte ch);
     void unMuteChannel(byte ch);
@@ -118,16 +123,6 @@ extern void ATM_playroutine() asm("ATM_playroutine");
                 "muls r18,                   r27                  " "\n\t" \
                 "add  r26,                   r1                   " "\n\t"
 
-#define ATM__MIX_TRI(N) \
-                "lds  r18,                   osc+" #N "*%[mul]+%[pha]+1" "\n\t" \
-                "sbrc r18,                   7                    " "\n\t" \
-                "com  r18                                         " "\n\t" \
-                "lsl  r18                                         " "\n\t" \
-                "subi r18,                   128                  " "\n\t" \
-                "lds  r27,                   osc+" #N "*%[mul]+%[vol]  " "\n\t" \
-                "muls r18,                   r27                  " "\n\t" \
-                "add  r26,                   r1                   " "\n\t"
-
 
 #if (ATM_WAVE_CH0 == ATM_WAVE_NOISE) || (ATM_WAVE_CH1 == ATM_WAVE_NOISE) || (ATM_WAVE_CH2 == ATM_WAVE_NOISE) || (ATM_WAVE_CH3 == ATM_WAVE_NOISE)
 #define ATM__NEED_NOISE 1
@@ -135,50 +130,50 @@ extern void ATM_playroutine() asm("ATM_playroutine");
 #define ATM__NEED_NOISE 0
 #endif
 
-#if ATM_WAVE_CH0 == ATM_WAVE_PULSE
+#if ATM_WAVE_CH0 == ATM_WAVE_OFF
+#define ATM__CH0
+#elif ATM_WAVE_CH0 == ATM_WAVE_PULSE
 #define ATM__CH0 ATM__PHASE(0) ATM__MIX_PULSE(0)
 #elif ATM_WAVE_CH0 == ATM_WAVE_SQUARE
 #define ATM__CH0 ATM__PHASE(0) ATM__MIX_SQUARE(0)
 #elif ATM_WAVE_CH0 == ATM_WAVE_SAW
 #define ATM__CH0 ATM__PHASE(0) ATM__MIX_SAW(0)
-#elif ATM_WAVE_CH0 == ATM_WAVE_TRI
-#define ATM__CH0 ATM__PHASE(0) ATM__MIX_TRI(0)
 #else
 #define ATM__CH0 ATM__MIX_NOISE(0)
 #endif
 
-#if ATM_WAVE_CH1 == ATM_WAVE_PULSE
+#if ATM_WAVE_CH1 == ATM_WAVE_OFF
+#define ATM__CH1
+#elif ATM_WAVE_CH1 == ATM_WAVE_PULSE
 #define ATM__CH1 ATM__PHASE(1) ATM__MIX_PULSE(1)
 #elif ATM_WAVE_CH1 == ATM_WAVE_SQUARE
 #define ATM__CH1 ATM__PHASE(1) ATM__MIX_SQUARE(1)
 #elif ATM_WAVE_CH1 == ATM_WAVE_SAW
 #define ATM__CH1 ATM__PHASE(1) ATM__MIX_SAW(1)
-#elif ATM_WAVE_CH1 == ATM_WAVE_TRI
-#define ATM__CH1 ATM__PHASE(1) ATM__MIX_TRI(1)
 #else
 #define ATM__CH1 ATM__MIX_NOISE(1)
 #endif
 
-#if ATM_WAVE_CH2 == ATM_WAVE_PULSE
+#if ATM_WAVE_CH2 == ATM_WAVE_OFF
+#define ATM__CH2
+#elif ATM_WAVE_CH2 == ATM_WAVE_PULSE
 #define ATM__CH2 ATM__PHASE(2) ATM__MIX_PULSE(2)
 #elif ATM_WAVE_CH2 == ATM_WAVE_SQUARE
 #define ATM__CH2 ATM__PHASE(2) ATM__MIX_SQUARE(2)
 #elif ATM_WAVE_CH2 == ATM_WAVE_SAW
 #define ATM__CH2 ATM__PHASE(2) ATM__MIX_SAW(2)
-#elif ATM_WAVE_CH2 == ATM_WAVE_TRI
-#define ATM__CH2 ATM__PHASE(2) ATM__MIX_TRI(2)
 #else
 #define ATM__CH2 ATM__MIX_NOISE(2)
 #endif
 
-#if ATM_WAVE_CH3 == ATM_WAVE_PULSE
+#if ATM_WAVE_CH3 == ATM_WAVE_OFF
+#define ATM__CH3
+#elif ATM_WAVE_CH3 == ATM_WAVE_PULSE
 #define ATM__CH3 ATM__PHASE(3) ATM__MIX_PULSE(3)
 #elif ATM_WAVE_CH3 == ATM_WAVE_SQUARE
 #define ATM__CH3 ATM__PHASE(3) ATM__MIX_SQUARE(3)
 #elif ATM_WAVE_CH3 == ATM_WAVE_SAW
 #define ATM__CH3 ATM__PHASE(3) ATM__MIX_SAW(3)
-#elif ATM_WAVE_CH3 == ATM_WAVE_TRI
-#define ATM__CH3 ATM__PHASE(3) ATM__MIX_TRI(3)
 #else
 #define ATM__CH3 ATM__MIX_NOISE(3)
 #endif

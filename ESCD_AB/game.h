@@ -7,7 +7,7 @@
 
 void stateMenuPlay()
 {
-  ATM.stop();
+  //ATM.stop();
   scorePlayer = 0;
   player.set();
   // 1-based: NEXT_LEVEL increments, then buildRooms uses levels[level-1]
@@ -78,7 +78,7 @@ void stateGameNextRoom()
 void stateGameNextLevel()
 {
   level++;
-  if (level > (sizeof(levels) / sizeof(levels[0])))
+  if (level > AMOUNT_OF_LEVELS)
   {
     loadAndFillMessage(6);
     addNumber(scorePlayer,24,6);
