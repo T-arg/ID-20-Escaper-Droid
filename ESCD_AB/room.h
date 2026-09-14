@@ -364,25 +364,38 @@ void drawNothing()
 
 void drawFloor()
 {
+  bool menu = gameState < STATE_GAME_PLAYING;
+
   for (byte y = 0; y < 5; y++)
   {
     for (byte x = 0; x < 5; x++)
     {
       byte tile = y * 5 + x;
-      // title screen: cheapest black tiles — skip draw (framebuffer is already cleared)
-      // 5-9, 11, 16, 21
-      if (gameState < STATE_GAME_PLAYING)
+      if (menu && ((tile > 5 && tile <= 9) || tile == 11 || tile == 16 || tile == 21))
+        continue;
+
+      byte fr = 0;
+      if (!menu && x == 2 && y == 2 && currentRoom == exitRoomLocation)
       {
-        if ((tile > 5 && tile <= 9) || tile == 11 || tile == 16 || tile == 21)
-          continue;
+        if (arduboy.everyXFrames(8)) levelUpAnimation = (++levelUpAnimation % 3);
+        fr = 5 + levelUpAnimation;
       }
-      if (x==2 && y == 2 && currentRoom == exitRoomLocation && gameState >= STATE_GAME_PLAYING) 
-      {
-        if ((arduboy.everyXFrames(8))) levelUpAnimation = (++levelUpAnimation % 3);
-        sprites.drawPlusMask(48 - (12 * x) + (12 * y), currentRoomY + 27 + (6 * x) + (6 * y), floorTile_plus_mask, 5 + levelUpAnimation);
-      }
-      else sprites.drawPlusMask(48 - (12 * x) + (12 * y), currentRoomY + 27 + (6 * x) + (6 * y), floorTile_plus_mask, 0);
+      sprites.drawPlusMask(48 - 12 * x + 12 * y,
+                           currentRoomY + 27 + 6 * x + 6 * y,
+                           floorTile_plus_mask, fr);
     }
+  }
+
+  if (!menu) return;
+
+  for (byte i = 0; i < 5; i++)
+    sprites.drawSelfMasked(39 + (i << 3), currentRoomY + 46, escaperDroid, i);
+  for (byte i = 0; i < 9; i++)
+    sprites.drawSelfMasked(23 + (i << 3), currentRoomY + 54, escaperDroid, 5 + i);
+  for (byte i = 0; i < 4; i++)
+  {
+    sprites.drawSelfMasked(15 + (i << 3), currentRoomY + 62, escaperDroid, 14 + i);
+    sprites.drawSelfMasked(71 + (i << 3), currentRoomY + 62, escaperDroid, 17 + i);
   }
 }
 
@@ -414,7 +427,7 @@ void drawTicker(byte setTicker)
 
   if (arduboy.everyXFrames(30)&& (bitRead(setTicker,5))) bitToggle(showTicker,0);
 
-  if (arduboy.everyXFrames(8))
+  if (arduboy.everyXFrames(4))
   {
     switch (setTicker)
     {

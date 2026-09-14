@@ -74,6 +74,7 @@ void spawnPlayerShot()
 {
   if (playerShot.active) return;
   if ((player.assets & 0b00000111) == 0) return;
+  play_SFX(SFX_SHOOT);
   player.assets--;
   playerShot.active = true;
   playerShot.steps = 0;

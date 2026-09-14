@@ -6,6 +6,9 @@ byte soundMode = 0;
 
 #define SFX_DOOR    0
 #define SFX_PICKUP  1
+#define SFX_MENU    2
+#define SFX_SHOOT   3
+#define SFX_BOOT    4
 
 const uint8_t sfxDoorClosed[] PROGMEM = {
   ATM_VOL(63),
@@ -25,9 +28,41 @@ const uint8_t pickUp[] PROGMEM = {
   ATM_STOP_CHAN,
 };
 
+const uint8_t menuClick[] PROGMEM = {
+  ATM_VOL(63),
+  ATM_SL_VOL(-8),
+  ATM_NOTE_G3,
+  ATM_DELAY(7),
+  ATM_STOP_CHAN,
+};
+
+const uint8_t shootBullet[] PROGMEM = {
+  ATM_VOL(63),
+  ATM_SL_VOL(-8),
+  ATM_GLIS(1),
+  ATM_CUT(0),
+  ATM_NOTE_C3,
+  ATM_DELAY(8),
+  ATM_STOP_CHAN,
+};
+
+const uint8_t bootTune[] PROGMEM = {
+  ATM_VOL(63),
+  ATM_SL_VOL(-8),
+  ATM_NOTE_C6,
+  ATM_DELAY(2),
+  ATM_NOTE_A5,
+  ATM_DELAY(2),
+  ATM_NOTE_F5,
+  ATM_DELAY(2),
+  ATM_NOTE_G5,
+  ATM_DELAY(2),
+  ATM_STOP_CHAN,
+};
+
 const unsigned char * const PROGMEM soundFX[] =
 {
-  sfxDoorClosed, pickUp,
+  sfxDoorClosed, pickUp, menuClick, shootBullet, bootTune,
 };
 
 #endif

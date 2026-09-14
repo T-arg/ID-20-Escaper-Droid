@@ -69,7 +69,7 @@ void stateMenuMain()
 {
   drawTitleScreen();
   drawFloor();
-
+  //drawGameName();
 
   drawSelectedWordMask(pgm_read_byte(&menuWordX[menuSelection]));
 
@@ -78,15 +78,26 @@ void stateMenuMain()
   sprites.drawPlusMask(51, 9+SET_THE_DANCERS_Y, droid_plus_mask, 2+danceDroid);
 
   // drawing the 4 enemies on the title screen a loop is not saving memory
-  sprites.drawPlusMask(27, 21+SET_THE_DANCERS_Y, enemies_plus_mask, 6+danceDroid);
-  sprites.drawPlusMask(3, 33+SET_THE_DANCERS_Y, enemies_plus_mask, 14+danceDroid);
   sprites.drawPlusMask(75, 21+SET_THE_DANCERS_Y, enemies_plus_mask, 2+danceDroid);
+  sprites.drawPlusMask(27, 21+SET_THE_DANCERS_Y, enemies_plus_mask, 6+danceDroid);
   sprites.drawPlusMask(99, 33+SET_THE_DANCERS_Y, enemies_plus_mask, 10+danceDroid);
+  sprites.drawPlusMask(3, 33+SET_THE_DANCERS_Y, enemies_plus_mask, 14+danceDroid);
 
-  if (arduboy.justPressed(RIGHT_BUTTON) && (menuSelection < 3)) menuSelection++;
-  if (arduboy.justPressed(LEFT_BUTTON) && (menuSelection > 0)) menuSelection--;
+
+
+  if (arduboy.justPressed(RIGHT_BUTTON) && (menuSelection < 3))
+  {
+    play_SFX(SFX_MENU);
+    menuSelection++;
+  }
+  if (arduboy.justPressed(LEFT_BUTTON) && (menuSelection > 0))
+  {
+    play_SFX(SFX_MENU);
+    menuSelection--;
+  }
   if (arduboy.justPressed(A_BUTTON | B_BUTTON))
   {
+    play_SFX(SFX_PICKUP);
     gameState = menuSelection + 1;
     loadAndFillMessage(menuSelection + 1);
     if (gameState == STATE_MENU_SDFX)
@@ -103,10 +114,19 @@ void stateMenuConf()
   drawFloor();
   // " BUTTON SCHEME    N<>S  E<>W"  N<>S @ char 18 → x72, E<>W @ char 24 → x96
   drawSelectedWordMask(buttonSchemeOffset ? 96 : 72);
-  if (arduboy.justPressed(RIGHT_BUTTON)) buttonSchemeOffset = 4;
-  if (arduboy.justPressed(LEFT_BUTTON)) buttonSchemeOffset = 0;
+  if (arduboy.justPressed(RIGHT_BUTTON))
+  {
+    play_SFX(SFX_MENU);
+    buttonSchemeOffset = 4;
+  }
+  if (arduboy.justPressed(LEFT_BUTTON))
+  {
+    play_SFX(SFX_MENU);
+    buttonSchemeOffset = 0;
+  }
   if (arduboy.justPressed(A_BUTTON | B_BUTTON))
   {
+    play_SFX(SFX_PICKUP);
     statePrepForMainMenu();
   }
 }
@@ -118,6 +138,7 @@ void stateMenuInfo()
   setTicker = TEXT_SCROLL_LEFT;
   if (arduboy.justPressed(A_BUTTON | B_BUTTON))
   {
+    play_SFX(SFX_PICKUP);
     statePrepForMainMenu();
   }
 }
@@ -134,16 +155,19 @@ void stateMenuSdfx()
   
   if (arduboy.justPressed(RIGHT_BUTTON) && (menuSelection < 3))
   {
+    play_SFX(SFX_MENU);
     menuSelection++;
     checkSoundState(menuSelection);
   }
   if (arduboy.justPressed(LEFT_BUTTON) && (menuSelection > 0))
   {
+    play_SFX(SFX_MENU);
     menuSelection--;
     checkSoundState(menuSelection);
   }
   if (arduboy.justPressed(A_BUTTON | B_BUTTON))
   {
+    play_SFX(SFX_MENU);
     arduboy.audio.saveOnOff();
     menuSelection = STATE_MENU_SELECT_SDFX;
     statePrepForMainMenu();

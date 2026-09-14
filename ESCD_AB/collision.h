@@ -373,6 +373,7 @@ void updatePlayerShot()
 void spawnEnemyShot(byte enemySlot)
 {
   if (enemyBulletActive) return;
+  play_SFX(SFX_SHOOT);
   enemyBulletActive = true;
   elements[ENEMY_BULLET].x = elements[enemySlot].x;
   elements[ENEMY_BULLET].y = elements[enemySlot].y;
