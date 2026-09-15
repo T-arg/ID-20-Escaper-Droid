@@ -5,7 +5,7 @@
 
 #define Song const uint8_t PROGMEM
 
-Song introMusic[] = {           // total song in bytes = 50
+Song introMusic[] = {           // total amount of bytes used = 37
   //                            // setup bytes 13
   0x03,                         // Number of tracks
 
@@ -18,11 +18,11 @@ Song introMusic[] = {           // total song in bytes = 50
   0x00,                         // Channel 2 entry track (SAW)
   0x00,                         // Channel 3 entry track (NOISE)
 
-  //"Track 0"                   // bytes = 3
+  //"Track 0"                   // bytes used 3
   0x40,0,                       // FX: SET VOLUME: volume = 0
   0x9F,                         // FX: STOP CURRENT CHANNEL
 
-  //"track 3"                   // / bytes = 17
+  //"track 3"                   // / bytes used 19
   ATM_VOL(48),                  // FX: SET VOLUME: volume = 48
   ATM_SET_TEMPO(24),
   ATM_NOTE_C3,
@@ -38,7 +38,7 @@ Song introMusic[] = {           // total song in bytes = 50
   ATM_CUE(1),
   0x9F,
 
-  //"track 4"
+  //"track 4"                      // bytes used = 15
   ATM_VOL(48),                     // FX: SET VOLUME: volume = 24
   ATM_NOTE_C2,
   ATM_DELAY(32),
@@ -55,7 +55,7 @@ Song introMusic[] = {           // total song in bytes = 50
 
 
 
-Song menuSong[] = {
+Song menuSong[] = {     // total in song bytes = 
 0x18,                   // Number of tracks
 0x00, 0x00,             // Address of track 0
 0x05, 0x00,             // Address of track 1   5
@@ -404,9 +404,66 @@ ATM_GOTO(20),               // GOTO track 20
 ATM_REPEAT(15, 21),           // REPEAT: count = 15 + 1 / track = 21
 ATM_STOP_CHAN,                   // FX: STOP CURRENT CHANNEL
 // DRUM END
-    
 };
 
+Song youDied[] = {              // total song in bytes = 64
+  0x06,                         // Number of tracks
+  0x00, 0x00,                   // Address of track 0
+  0x0A, 0x00,                   // Address of track 1
+  0x12, 0x00,                   // Address of track 2
+  0x15, 0x00,                   // Address of track 3
+  0x20, 0x00,                   // Address of track 4
+  0x2C, 0x00,                   // Address of track 5
+
+  0x00,                         // Channel 0 entry track
+  0x01,                         // Channel 1 entry track
+  0x02,                         // Channel 2 entry track
+  0x02,                         // Channel 3 entry track
+
+  //"Track 0"
+  0x40, 80,                     // FX: SET VOLUME: volume = 80
+  0x9D, 14,                     // SET song tempo: value = 14
+  0x41, (uint8_t)-6,                     // FX: VOLUME SLIDE ON: steps = -6
+  0xFD, 63, 3,                  // REPEAT: count = 63 + 1 / track = 3
+  0x9F,                         // FX: STOP CURRENT CHANNEL
+
+  //"Track 1"
+  0x40, 48,                     // FX: SET VOLUME: volume = 48
+  0x41, (uint8_t)-1,                     // FX: VOLUME SLIDE ON: steps = -1
+  0xFD, 20, 4,                  // REPEAT: count = 20 + 1 / track = 4
+  0x9F,                         // FX: STOP CURRENT CHANNEL
+
+  //"Track 2"
+  0x40, 0,                      // FX: SET VOLUME: volume = 0
+  0x9F,                         // FX: STOP CURRENT CHANNEL
+
+  //"Track 3"
+  0x00 + 43,                    // NOTE ON: note = 31
+  0x9F + 16,                    // DELAY: ticks = 32
+  0x00 + 50,                    // NOTE ON: note = 38
+  0x9F + 16,                    // DELAY: ticks = 32
+  0x00 + 46,                    // NOTE ON: note = 34
+  0x9F + 16,                    // DELAY: ticks = 32
+  0x00 + 46,                    // NOTE ON: note = 34
+  0x9F + 8,                     // DELAY: ticks = 16
+  0x00 + 45,                    // NOTE ON: note = 33
+  0x9F + 8,                     // DELAY: ticks = 16
+  0xFE,                         // RETURN
+
+  //"Track 4"
+  0xFC, 5,                      // GOTO track 5
+  0x4C, (uint8_t)-2,                     // FX: SET TRANSPOSITION: notes = -2
+  0xFC, 5,                      // GOTO track 5
+  0x4C, 2,                      // FX: SET TRANSPOSITION: notes = 2
+  0xFC, 5,                      // GOTO track 5
+  0x4D,                         // FX: TRANSPOSITION OFF
+  0xFE,                         // RETURN
+
+  //"Track 5"
+  0x00 + 5,                     // NOTE ON: note = 5
+  0x9F + 64,                    // DELAY: ticks = 64
+  0xFE,                         // RETURN
+};
 
 
 #endif

@@ -68,8 +68,8 @@ void checkInputs()
 
     if (player.isOnTile == pgm_read_byte(&doorTile[dir]))
     {
-      playerChecksAndOpensDoor(dir);
       playerChecksAndOpensLevelDoor(dir);
+      playerChecksAndOpensDoor(dir); 
     }
 
     byte objType = elements[OBJECT].characteristics & 0b00000111;

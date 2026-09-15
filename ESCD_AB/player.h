@@ -83,6 +83,12 @@ void spawnPlayerShot()
   playerShot.dir = player.characteristics & 0b00000011;
 }
 
+void songSpeedChange()
+{
+  if (player.life>1) play_SFX(SFX_SPEEDNORMAL);
+  else play_SFX(SFX_SPEEDUP);
+}
+
 void walkThroughDoor()
 {
   if (bitRead(player.characteristics, DROID_GOES_THROUGH_DOOR_AT_BIT_5) || bitRead(player.characteristics, DROID_COMES_OUT_DOOR_AT_BIT_6)) player.steps++;
@@ -117,8 +123,11 @@ void playerLosesLife()
   {
     player.life--;
     bitSet(player.characteristics, DROID_IMMUNE_AT_BIT_3);
+    songSpeedChange();
     if (player.life < 1)
     {
+      ATM.play(youDied);
+      if (soundMode >= 2) ATM.pause();   // SFX only: keep ISR, freeze score
       bitSet(player.characteristics, DROID_DYING_AT_BIT_4);
       bitClear(player.characteristics, DROID_IMMUNE_AT_BIT_3);
     }

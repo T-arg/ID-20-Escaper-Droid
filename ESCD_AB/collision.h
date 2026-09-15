@@ -36,18 +36,19 @@ boolean hitBorders(int objectX, int objectY, int directionFacing, bool playerOrE
 }
 
 void playerChecksAndOpensDoor(byte direction)
-{
+{//
+                                          // NORTH = 0 
   if ((player.assets & 0b00011000) && (checkIfLevelDoor() != direction))
   {
     player.assets -= 0b00001000;
     scorePlayer += SCORE_OPEN_DOOR;
     bitClear(stageRoom[currentRoom].doorsClosedActive, direction);
   }
-  else
+  else if (checkIfLevelDoor() != direction)
   {
     play_SFX(SFX_DOOR);
     loadAndFillMessage(7);
-    setTicker = TEXT_BLINK;
+    setTicker = TEXT_BLINK_SCROLL_RIGHT;
     showTicker = TRUE;
   }
 }
@@ -60,11 +61,11 @@ void playerChecksAndOpensLevelDoor(byte direction)
     scorePlayer += SCORE_LEVEL_DOOR;
     bitClear(stageRoom[currentRoom].doorsClosedActive, direction);
   }
-  else
+  else if (checkIfLevelDoor() == direction)
   {
     play_SFX(SFX_DOOR);
     loadAndFillMessage(8);
-    setTicker = TEXT_BLINK;
+    setTicker = TEXT_BLINK_SCROLL_RIGHT;
     showTicker = TRUE;
   }
 }
@@ -201,6 +202,7 @@ void checkObjectTypeAndAct()
       break;
     case PICKUP_BATTERY:
       play_SFX(SFX_PICKUP);
+      songSpeedChange();
       if (player.life < 3)
       {
         player.life++;

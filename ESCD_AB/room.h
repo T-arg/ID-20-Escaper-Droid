@@ -425,7 +425,7 @@ void drawTicker(byte setTicker)
     }
   }
 
-  if (arduboy.everyXFrames(30)&& (bitRead(setTicker,5))) bitToggle(showTicker,0);
+  if (arduboy.everyXFrames(20)&& (bitRead(setTicker,5))) bitToggle(showTicker,0);
 
   if (arduboy.everyXFrames(4))
   {
