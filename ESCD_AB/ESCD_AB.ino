@@ -1,6 +1,6 @@
 /*
   Escaper Droid
-  Arduboy version 0.8.15
+  Arduboy version 0.8.16
   
   STARTED by TEAM a.r.g.
   2016 - JO3RI - STG
@@ -50,7 +50,11 @@ void setup()
   arduboy.audio.begin();
   arduboy.setFrameRate(45);
   if (!arduboy.audio.enabled()) soundMode = 3;
-  else ATM.play(introMusic);
+  else
+  {
+    ATM.play(introMusic);
+    //ATM.play(badNews);
+  }
 }
 
 void loop() {

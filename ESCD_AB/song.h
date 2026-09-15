@@ -5,50 +5,55 @@
 
 #define Song const uint8_t PROGMEM
 
-Song introMusic[] = {                // total song in bytes = 50
+Song introMusic[] = {           // total song in bytes = 50
   //                            // setup bytes 13
-  0x04,                         // Number of tracks
+  0x03,                         // Number of tracks
+
   0x00, 0x00,                   // Address of track 0
   0x03, 0x00,                   // Address of track 1
-  0x0B, 0x00,                   // Address of track 2
-  0x1C, 0x00,                   // Address of track 3
+  0x16, 0x00,                   // Address of track 2
   
-  0x01,                         // Channel 0 entry track (PULSE)
-  ATM_STOP,                         // Channel 1 entry track (SQUARE)
-  ATM_STOP,                         // Channel 2 entry track (TRIANGLE)
-  ATM_STOP,                         // Channel 3 entry track (NOISE)
+  0x02,                         // Channel 0 entry track (PULSE)
+  0x01,                         // Channel 1 entry track (SQUARE)
+  0x00,                         // Channel 2 entry track (SAW)
+  0x00,                         // Channel 3 entry track (NOISE)
 
-  //"Track 0"                   // ticks = 0 / bytes = 3
-  ATM_VOL(0),                      // FX: SET VOLUME: volume = 0
-  ATM_STOP_CHAN,                         // FX: STOP CURRENT CHANNEL
+  //"Track 0"                   // bytes = 3
+  0x40,0,                       // FX: SET VOLUME: volume = 0
+  0x9F,                         // FX: STOP CURRENT CHANNEL
 
-  //"Track 1"                   // ticks = 2048 / bytes = 8
-  ATM_SET_TEMPO(160),                     // SET song tempo: value = 25
-  ATM_VOL(48),                     // FX: SET VOLUME: volume = 48
-  ATM_REPEAT(7, 2),                   // REPEAT: count = 7 + 1 / track = 2  (8 * 256 ticks)
-  ATM_STOP_CHAN,                         // FX: STOP CURRENT CHANNEL
+  //"track 3"                   // / bytes = 17
+  ATM_VOL(48),                  // FX: SET VOLUME: volume = 48
+  ATM_SET_TEMPO(24),
+  ATM_NOTE_C3,
+  ATM_DELAY(32),
+  ATM_SL_FRQ(8),
+  ATM_NOTE_C3,
+  ATM_DELAY(64),
+  ATM_SL_FRQ_OFF,
+  ATM_NOTE_C4,
+  ATM_DELAY(16),
+  ATM_SL_VOL(-4),
+  ATM_DELAY(32),
+  ATM_CUE(1),
+  0x9F,
 
-  //"Track 2"                   // ticks = 256 / bytes = 17
-  ATM_GOTO(3),                      // GOTO: track = 3  (64 ticks)
-  ATM_SET_TRA(-5),                     // FX: SET TRANSPOSITION: notes = -5
-  ATM_GOTO(3),                      // GOTO: track = 3  (64 ticks)
-  ATM_SET_TRA(-3),                     // FX: SET TRANSPOSITION: notes = -3
-  ATM_GOTO(3),                      // GOTO: track = 3  (64 ticks)
-  ATM_SET_TRA(-1),                     // FX: SET TRANSPOSITION: notes = -1
-  ATM_GOTO(3),                      // GOTO: track = 3  (64 ticks)
-  ATM_SET_TRA(0),                      // FX: SET TRANSPOSITION: notes = 0
-  ATM_RETURN,                         // RETURN
-
-  //"Track 3"                   // ticks = 64 / bytes = 9
-  ATM_SL_VOL(-4),                     // FX: VOLUME SLIDE ON: steps = -4
-  ATM_NOTE_C5,                    // NOTE ON: note = 37
-  ATM_DELAY(16),                    // DELAY: ticks = 16
-  ATM_NOTE_E5,                    // NOTE ON: note = 41
-  ATM_DELAY(16),                    // DELAY: ticks = 16
-  ATM_NOTE_G5,                    // NOTE ON: note = 44
-  ATM_DELAY(16),                    // DELAY: ticks = 16
-  ATM_RETURN,                         // RETURN
+  //"track 4"
+  ATM_VOL(48),                     // FX: SET VOLUME: volume = 24
+  ATM_NOTE_C2,
+  ATM_DELAY(32),
+  ATM_SL_FRQ(12),
+  ATM_NOTE_C2,
+  ATM_DELAY(64),
+  ATM_SL_FRQ_OFF,
+  ATM_NOTE_C4,
+  ATM_DELAY(16),
+  ATM_SL_VOL(-4),
+  ATM_DELAY(16),
+  0x9F,
 };
+
+
 
 Song menuSong[] = {
 0x18,                   // Number of tracks
@@ -73,13 +78,13 @@ Song menuSong[] = {
 0x0B, 0x01,             // Address of track 18  267
 0x11, 0x01,             // Address of track 19  273
 0x5A, 0x01,             // Address of track 20  346
-0x62, 0x01,             // Address of track 21  354
-0x66, 0x01,             // Address of track 22  358
-0x6C, 0x01,             // Address of track 23  
+0x64, 0x01,             // Address of track 21  354
+0x68, 0x01,             // Address of track 22  358
+0x6E, 0x01,             // Address of track 23  
 
 0x06,                   // Channel 0 entry track
 0x12,                   // Channel 1 entry track
-ATM_STOP,                   // Channel 2 entry track
+0x00,                   // Channel 2 entry track
 0x16,                   // Channel 3 entry track
 
 //"Track 0"    
@@ -377,10 +382,11 @@ ATM_TRA_OFF,                   // FX: TRANSPOSITION OFF
 ATM_STOP_CHAN,                 // FX: STOP CURRENT CHANNEL
 
 //"Track 20"
-ATM_NOISE(4 + 0),            // FX: RETRIG NOISE: point = 1 (*4) / speed = 0 (fastest)
-ATM_VOL(32),               // FX: SET VOLUME: volume = 32
+ATM_CUE(2),
+ATM_NOISE(4 + 0),             // FX: RETRIG NOISE: point = 1 (*4) / speed = 0 (fastest)
+ATM_VOL(32),                  // FX: SET VOLUME: volume = 32
 ATM_SL_VOL(-6),               // FX: VOLUME SLIDE ON: steps = -6
-ATM_DELAY(16),              // DELAY: ticks = 16
+ATM_DELAY(16),                // DELAY: ticks = 16
 ATM_RETURN,                   // RETURN
 
 //"Track 21"

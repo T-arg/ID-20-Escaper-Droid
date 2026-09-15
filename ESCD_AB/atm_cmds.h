@@ -6,65 +6,64 @@
 // let's define command list for the ATMlib, that might be easier to use the AMT library
 
 // Let's define the basic commands
-#define ATM_STOP      	 				    0x00+0
-#define ATM_DELAY(delay) 				    0x9F+(delay)
-#define ATM_LONG_DELAY(delay)			    0x9F,(delay)
-#define ATM_GOTO(onceGoto)				    0xFC,(onceGoto)
-#define ATM_REPEAT(repeatTimes,track)	    0xFD,(repeatTimes),(track)
-#define ATM_RETURN						    0xFE
+#define ATM_DELAY(delay) 				        0x9F+(delay)
+#define ATM_LONG_DELAY(delay)			      0x9F,(delay)
+#define ATM_GOTO(onceGoto)				      0xFC,(onceGoto)
+#define ATM_REPEAT(repeatTimes,track)	  0xFD,(repeatTimes),(track)
+#define ATM_RETURN						          0xFE
 
-#define ATM_ADD_TEMPO(amount)				0x9C,(amount)
-#define ATM_SET_TEMPO(amount)				0x9D,(amount)
-#define ATM_GOTO_ADV(ch0,ch1,ch2,ch3)	0x9E,(ch0),(ch1),(ch2),(ch3)
-#define ATM_STOP_CHAN						0x9F
+#define ATM_ADD_TEMPO(amount)				    0x9C,(amount)
+#define ATM_SET_TEMPO(amount)				    0x9D,(amount)
+#define ATM_GOTO_ADV(ch0,ch1,ch2,ch3)	  0x9E,(ch0),(ch1),(ch2),(ch3)
+#define ATM_STOP_CHAN						        0x9F
 
 
 // Let's define the effect commands
 // VOLUME - VOLUME SLIDE
-#define ATM_VOL(setVolume)					0x40,(setVolume)
-#define ATM_SL_VOL(slideVolume)				0x41,(slideVolume)
+#define ATM_VOL(setVolume)					    0x40,(setVolume)
+#define ATM_SL_VOL(slideVolume)				  0x41,(slideVolume)
 #define ATM_SL_VOL_ADV(amount,ticks)		0x42,(amount),(ticks)
-#define ATM_SL_VOL_OFF						0x43
+#define ATM_SL_VOL_OFF						      0x43
 
 // FREQUENCE SLIDE
 #define ATM_SL_FRQ(slideFrequency)			0x44,(slideFrequency)
 #define ATM_SL_FRQ_ADV(amount,ticks)		0x45,(amount),(ticks)
-#define ATM_SL_FRQ_OFF						0x46
+#define ATM_SL_FRQ_OFF						      0x46
 
 // ARPEGGIO
-#define ATM_ARP(thirdNote,ticks)			0x47,(thirdNote),(ticks)
-#define ATM_ARP_OFF							0x48
+#define ATM_ARP(thirdNote,ticks)			  0x47,(thirdNote),(ticks)
+#define ATM_ARP_OFF							        0x48
 
 // RETRIGGERING NOISE ON THE NOISE CHANNEL 3
 #define ATM_NOISE(entryPointAndSpeed)		0x49,(entryPointAndSpeed)
-#define ATM_NOISE_OFF						0x4A
+#define ATM_NOISE_OFF						        0x4A
 
 // TRANSPOSITION
-#define ATM_ADD_TRA(amount)					0x4B,(amount)
-#define ATM_SET_TRA(amount)					0x4C,(amount)
-#define ATM_TRA_OFF							0x4D
+#define ATM_ADD_TRA(amount)					    0x4B,(amount)
+#define ATM_SET_TRA(amount)					    0x4C,(amount)
+#define ATM_TRA_OFF							        0x4D
 
 // TREMOLO
-#define ATM_TREM(depth,rate)				0x4E,(depth),(rate)
-#define ATM_TREM_OFF						0x4F
+#define ATM_TREM(depth,rate)				    0x4E,(depth),(rate)
+#define ATM_TREM_OFF						        0x4F
 
 // VIBRATO
-#define ATM_VIB(depth,rate)				0x50,(depth),(rate)
-#define ATM_VIB_OFF							0x51
+#define ATM_VIB(depth,rate)				      0x50,(depth),(rate)
+#define ATM_VIB_OFF							        0x51
 
 // GLISSANDO
-#define ATM_GLIS(noteTicks)					0x52,(noteTicks)
-#define ATM_GLIS_OFF						0x53
+#define ATM_GLIS(noteTicks)					    0x52,(noteTicks)
+#define ATM_GLIS_OFF						        0x53
 
 // NOTE CUT
-#define ATM_CUT(amount)						0x54,(amount)
-#define ATM_CUT_OFF							0x55
+#define ATM_CUT(amount)						      0x54,(amount)
+#define ATM_CUT_OFF							        0x55
 
 // WAVEFORM (0 = PULSE, 1 = SQUARE, 2 = NOISE)
-#define ATM_WAVEFORM(type)					0x56,(type)
+#define ATM_WAVEFORM(type)					    0x56,(type)
 
 // Signal the sketch: ATM.check() returns this byte until the next cue or check()
-#define ATM_CUE(value)						0x57,(value)
+#define ATM_CUE(value)						      0x57,(value)
 
 
 // let's Define all 64 NOTES from C2 up to D7, actually 63 because note 0 means mute or no note

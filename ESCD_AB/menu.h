@@ -57,7 +57,7 @@ void statePrepForMainMenu()
 
 void stateMenuIntro()
 {
-  if (arduboy.everyXFrames(120))
+  if (ATM.check() ==1)
   {
     playMenuMusic();
     statePrepForMainMenu();
@@ -69,11 +69,10 @@ void stateMenuMain()
 {
   drawTitleScreen();
   drawFloor();
-  //drawGameName();
 
   drawSelectedWordMask(pgm_read_byte(&menuWordX[menuSelection]));
 
-  if (arduboy.everyXFrames(26)) danceDroid = !danceDroid;
+  if (ATM.check()== 2) danceDroid = !danceDroid;
 
   sprites.drawPlusMask(51, 9+SET_THE_DANCERS_Y, droid_plus_mask, 2+danceDroid);
 
@@ -155,19 +154,19 @@ void stateMenuSdfx()
   
   if (arduboy.justPressed(RIGHT_BUTTON) && (menuSelection < 3))
   {
-    play_SFX(SFX_MENU);
     menuSelection++;
     checkSoundState(menuSelection);
+    play_SFX(SFX_MENU);
   }
   if (arduboy.justPressed(LEFT_BUTTON) && (menuSelection > 0))
   {
-    play_SFX(SFX_MENU);
     menuSelection--;
     checkSoundState(menuSelection);
+    play_SFX(SFX_MENU);
   }
   if (arduboy.justPressed(A_BUTTON | B_BUTTON))
   {
-    play_SFX(SFX_MENU);
+    play_SFX(SFX_PICKUP);
     arduboy.audio.saveOnOff();
     menuSelection = STATE_MENU_SELECT_SDFX;
     statePrepForMainMenu();
