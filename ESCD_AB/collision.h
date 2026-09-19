@@ -334,24 +334,50 @@ bool shotHitsBlockingFloor(byte occupant)
   return (kind == FLOOR_BOX || kind == FLOOR_SPIKE);
 }
 
+// itemsOrder is a z-buffer. The droid is written last, so it overwrites an
+// enemy that shares the tile. Shots must test live positions, not that slot.
+byte shotHitsEnemyAt(int sx, int sy)
+{
+  byte shotTile = tileFromXY(sx, sy);
+  if (shotTile >= 25) return 255;
+  for (byte i = 0; i < 2; i++)
+  {
+    if (!bitRead(stageRoom[currentRoom].elementsActive, 7 - i)) continue;
+    if (tileFromXY(elements[i].x, elements[i].y) == shotTile) return i;
+  }
+  return 255;
+}
+
+bool shotHitsPlayerAt(int sx, int sy)
+{
+  byte shotTile = tileFromXY(sx, sy);
+  if (shotTile >= 25) return false;
+  return (tileFromXY(player.x, player.y - currentRoomY) == shotTile);
+}
+
 bool resolveShotOnTile(int sx, int sy, byte dir, bool fromPlayer)
 {
   if (hitBorders(sx, sy, dir, ENEMY))
     return true;
 
-  byte occupant = tileOccupant(sx, sy);
-  if (fromPlayer && (occupant == ENEMY_ONE || occupant == ENEMY_TWO))
+  if (fromPlayer)
   {
-    if ((elements[occupant].characteristics & 0b00000111) == ENEMY_MOVER)
-      return false;
-    killEnemy(occupant);
-    return true;
+    byte hit = shotHitsEnemyAt(sx, sy);
+    if (hit < 2)
+    {
+      killEnemy(hit);
+      return true;
+    }
   }
-  if (!fromPlayer && occupant == PLAYER_DROID)
+  else if (shotHitsPlayerAt(sx, sy))
   {
     playerLosesLife();
     return true;
   }
+
+  byte occupant = tileOccupant(sx, sy);
+  if (occupant == PLAYER_DROID || occupant == ENEMY_ONE || occupant == ENEMY_TWO)
+    occupant = EMPTY_PLACE;
   if (shotHitsBlockingFloor(occupant) || occupant == OBJECT)
     return true;
 
@@ -365,6 +391,16 @@ void updatePlayerShot()
 
   stepShot(playerShot.x, playerShot.y, playerShot.dir);
   playerShot.steps++;
+
+  // Actors every iso step so a moving target cannot slip between tile centres.
+  byte hit = shotHitsEnemyAt(playerShot.x, playerShot.y);
+  if (hit < 2)
+  {
+    killEnemy(hit);
+    deactivatePlayerShot();
+    return;
+  }
+
   if (playerShot.steps < SHOT_STEPS_PER_TILE) return;
   playerShot.steps = 0;
 
@@ -396,6 +432,14 @@ void updateEnemyShot()
   byte dir = (elements[ENEMY_BULLET].characteristics & 0b00011000) >> 3;
   stepShot(elements[ENEMY_BULLET].x, elements[ENEMY_BULLET].y, dir);
   elements[ENEMY_BULLET].frame++;
+
+  if (shotHitsPlayerAt(elements[ENEMY_BULLET].x, elements[ENEMY_BULLET].y))
+  {
+    playerLosesLife();
+    deactivateEnemyShot();
+    return;
+  }
+
   if (elements[ENEMY_BULLET].frame < SHOT_STEPS_PER_TILE) return;
   elements[ENEMY_BULLET].frame = 0;
 
