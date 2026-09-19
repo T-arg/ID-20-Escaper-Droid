@@ -46,9 +46,12 @@
 
 #define EMPTY_PLACE                   27
 
-
-//define how collision works
-#define DIFF(A, B) (((A) > (B)) ? ((A) - (B)) : ((B) - (A)))
+PROGMEM const byte doorFrontTile[] = {
+  TILE_INFRONT_DOOR_NORTH,
+  TILE_INFRONT_DOOR_EAST,
+  TILE_INFRONT_DOOR_SOUTH,
+  TILE_INFRONT_DOOR_WEST
+};
 
 byte levelUpAnimation = 0;
 
@@ -61,65 +64,62 @@ struct Room {
     byte roomNumberFromInfluencer;
     byte elementsInfluenced;
 
-    void set()
-    {
-      doorsClosedActive = 0b00000000;   // this byte holds all the 4 doors characteristics for each room
-      //                    ||||||||
-      //                    |||||||└->  0  DOOR NORTH  IS CLOSED (0 = false / 1 = true)
-      //                    ||||||└-->  1  DOOR EAST   IS CLOSED (0 = false / 1 = true)
-      //                    |||||└--->  2  DOOR SOUTH  IS CLOSED (0 = false / 1 = true)
-      //                    ||||└---->  3  DOOR WEST   IS CLOSED (0 = false / 1 = true)
-      //                    |||└----->  4  DOOR NORTH  EXISTS    (0 = false / 1 = true)
-      //                    ||└------>  5  DOOR EAST   EXISTS    (0 = false / 1 = true)
-      //                    |└------->  6  DOOR SOUTH  EXISTS    (0 = false / 1 = true)
-      //                    └-------->  7  DOOR WEST   EXISTS    (0 = false / 1 = true)
-
-      elementsActive = 0b00000000;
-      //                 ||||||||
-      //                 |||||||└->  7 => 0 FLOOR  5 EXISTS (0 = false / 1 = true)
-      //                 ||||||└-->  6 => 1 FLOOR  4 EXISTS (0 = false / 1 = true)
-      //                 |||||└--->  5 => 2 FLOOR  3 EXISTS (0 = false / 1 = true)
-      //                 ||||└---->  4 => 3 FLOOR  2 EXISTS (0 = false / 1 = true)
-      //                 |||└----->  3 => 4 FLOOR  1 EXISTS (0 = false / 1 = true)
-      //                 ||└------>  2 => 5 OBJECT 3 EXISTS (0 = false / 1 = true)
-      //                 |└------->  1 => 6 ENEMY  2 EXISTS (0 = false / 1 = true)
-      //                 └-------->  0 => 7 ENEMY  1 EXISTS (0 = false / 1 = true)
-
-      roomToTransportTo = 0b00000000;
-      //                    |||||||└->  \
-      //                    ||||||└-->   |
-      //                    |||||└--->   | these 6 bits are used for the roomnumber you'll go to
-      //                    ||||└---->   |
-      //                    |||└----->   |
-      //                    ||└------>  /
-      //                    |└-------> NOT USED
-      //                    └--------> NOT USED
-
-      roomNumberInfluencing = 0b00000000;
-      //                        |||||||└->0  \
-      //                        ||||||└-->1   |
-      //                        |||||└--->2   | these 6 bits are used for the roomnumber where the elements are influenced
-      //                        ||||└---->3   |
-      //                        |||└----->4   |
-      //                        ||└------>5  /
-      //                        |└------->6 NOT USED
-      //                        └-------->7 NOT USED
-
-      roomNumberFromInfluencer = 0b00000000;
-      //                           bits 0-6 unused (the old "from room" level byte is gone)
-      //                           bit 7 = switch is ON (remembered when you leave the room)
-
-      elementsInfluenced = 0b00000000;
-      //                     ||||||||
-      //                     |||||||└->0 FLOOR  1 INFLUENCED (0 = false / 1 = true)
-      //                     ||||||└-->1 FLOOR  2 INFLUENCED (0 = false / 1 = true)
-      //                     |||||└--->2 FLOOR  3 INFLUENCED (0 = false / 1 = true)
-      //                     ||||└---->3 FLOOR  4 INFLUENCED (0 = false / 1 = true)
-      //                     |||└----->4 FLOOR  5 INFLUENCED (0 = false / 1 = true)
-      //                     ||└------>5 ENEMY  1 INFLUENCED (0 = false / 1 = true)
-      //                     |└------->6 ENEMY  2 INFLUENCED (0 = false / 1 = true)
-      //                     └-------->7 OBJECT 3 INFLUENCED (0 = false / 1 = true)
-    }
+    // doorsClosedActive — this byte holds all the 4 doors characteristics for each room
+    //                    ||||||||
+    //                    |||||||└->  0  DOOR NORTH  IS CLOSED (0 = false / 1 = true)
+    //                    ||||||└-->  1  DOOR EAST   IS CLOSED (0 = false / 1 = true)
+    //                    |||||└--->  2  DOOR SOUTH  IS CLOSED (0 = false / 1 = true)
+    //                    ||||└---->  3  DOOR WEST   IS CLOSED (0 = false / 1 = true)
+    //                    |||└----->  4  DOOR NORTH  EXISTS    (0 = false / 1 = true)
+    //                    ||└------>  5  DOOR EAST   EXISTS    (0 = false / 1 = true)
+    //                    |└------->  6  DOOR SOUTH  EXISTS    (0 = false / 1 = true)
+    //                    └-------->  7  DOOR WEST   EXISTS    (0 = false / 1 = true)
+    //
+    // elementsActive
+    //                 ||||||||
+    //                 |||||||└->  7 => 0 FLOOR  5 EXISTS (0 = false / 1 = true)
+    //                 ||||||└-->  6 => 1 FLOOR  4 EXISTS (0 = false / 1 = true)
+    //                 |||||└--->  5 => 2 FLOOR  3 EXISTS (0 = false / 1 = true)
+    //                 ||||└---->  4 => 3 FLOOR  2 EXISTS (0 = false / 1 = true)
+    //                 |||└----->  3 => 4 FLOOR  1 EXISTS (0 = false / 1 = true)
+    //                 ||└------>  2 => 5 OBJECT 3 EXISTS (0 = false / 1 = true)
+    //                 |└------->  1 => 6 ENEMY  2 EXISTS (0 = false / 1 = true)
+    //                 └-------->  0 => 7 ENEMY  1 EXISTS (0 = false / 1 = true)
+    //
+    // roomToTransportTo
+    //                    |||||||└->  \
+    //                    ||||||└-->   |
+    //                    |||||└--->   | these 6 bits are used for the roomnumber you'll go to
+    //                    ||||└---->   |
+    //                    |||└----->   |
+    //                    ||└------>  /
+    //                    |└-------> NOT USED
+    //                    └--------> NOT USED
+    //
+    // roomNumberInfluencing
+    //                        |||||||└->0  \
+    //                        ||||||└-->1   |
+    //                        |||||└--->2   | these 6 bits are used for the roomnumber where the elements are influenced
+    //                        ||||└---->3   |
+    //                        |||└----->4   |
+    //                        ||└------>5  /
+    //                        |└------->6 NOT USED
+    //                        └-------->7 NOT USED
+    //
+    // roomNumberFromInfluencer
+    //                           bits 0-6 unused (the old "from room" level byte is gone)
+    //                           bit 7 = switch is ON (remembered when you leave the room)
+    //
+    // elementsInfluenced
+    //                     ||||||||
+    //                     |||||||└->0 FLOOR  1 INFLUENCED (0 = false / 1 = true)
+    //                     ||||||└-->1 FLOOR  2 INFLUENCED (0 = false / 1 = true)
+    //                     |||||└--->2 FLOOR  3 INFLUENCED (0 = false / 1 = true)
+    //                     ||||└---->3 FLOOR  4 INFLUENCED (0 = false / 1 = true)
+    //                     |||└----->4 FLOOR  5 INFLUENCED (0 = false / 1 = true)
+    //                     ||└------>5 ENEMY  1 INFLUENCED (0 = false / 1 = true)
+    //                     |└------->6 ENEMY  2 INFLUENCED (0 = false / 1 = true)
+    //                     └-------->7 OBJECT 3 INFLUENCED (0 = false / 1 = true)
 };
 
 Room stageRoom[MAX_AMOUNT_OF_ROOMS];
@@ -138,9 +138,8 @@ byte roomByte(byte roomNumber, byte offset)
   return lvByte(ROOMS_DATA_START_AT_BYTE + (BYTES_USED_FOR_EVERY_ROOM * roomNumber) + offset);
 }
 
-void buildRooms(byte currentLevel)
+void buildRooms()
 {
-  (void)currentLevel; // always the global `level`
   // let's read out in witch room the exit to the next level is
   exitRoomLocation = lvByte(LEVEL_ROOM_DATA_START_AT_BYTE);
 
@@ -152,8 +151,7 @@ void buildRooms(byte currentLevel)
   // start reading the data out off PROGMEM
   for (byte roomNumber = 0; roomNumber < amountOfRooms; roomNumber++)
   {
-    // clear all info
-    stageRoom[roomNumber].set();
+    memset(&stageRoom[roomNumber], 0, sizeof(Room));
 
     // now lets set all the data for each room in the current level from the datasheet
     // first set all the doors and if those are closed or open
@@ -195,6 +193,7 @@ byte checkIfLevelDoor()
 {
   byte test = lvByte(LEVEL_DOOR_DATA_START_AT_BYTE);
   if (currentRoom == ((test & 0b1111100)>>2)) return (test & 0b00000011);
+  return 255;
 }
 
 byte tileFromXY(byte x, byte y)
@@ -204,12 +203,6 @@ byte tileFromXY(byte x, byte y)
   x = (((y45 - x45) >> 8) + 18);
   y = (((y45 + x45) >> 8) - 49);
   return (y >> 4) * 5 + (x >> 4);
-}
-
-
-bool isoCollide(byte ax, byte ay, byte bx, byte by, byte max)
-{
-  return (DIFF(ax, bx) + DIFF(ay, by)) < max;
 }
 
 
@@ -269,9 +262,9 @@ bool checkIfOnCenterTile(byte coX, byte coY)
 }
 */
 
-void enterRoom(byte roomNumber, byte currentLevel)
+void enterRoom(byte roomNumber)
 {
-  
+ 
   playerShot.active = false;
   enemyBulletActive = false;
   objectHiddenThisVisit = false;
@@ -303,36 +296,19 @@ byte transportToRoom (byte roomNumber)
 }
 
 
-byte goToRoom(byte roomNumber, byte currentLevel)
+byte goToRoom(byte roomNumber)
 {
-  (void)currentLevel;
   // we know which door the player goes through by the direction the droid is facing
   byte door = player.characteristics & 0b00000011;
   return roomByte(roomNumber, 1 + door) >> 2;
 };
 
 
-byte goToTile(byte roomNumber, byte currentLevel)
+byte goToTile(byte roomNumber)
 {
-  (void)currentLevel;
   // we know which door the player goes through by the direction the droid is facing
   byte door = player.characteristics & 0b00000011;
-  byte doorGoingTo = roomByte(roomNumber, 1 + door) & 0b00000011;
-  switch (doorGoingTo)
-  {
-    case NORTH:
-      return TILE_INFRONT_DOOR_NORTH;
-      break;
-    case EAST:
-      return TILE_INFRONT_DOOR_EAST;
-      break;
-    case SOUTH:
-      return TILE_INFRONT_DOOR_SOUTH;
-      break;
-    case WEST:
-      return TILE_INFRONT_DOOR_WEST;
-      break;
-  }
+  return pgm_read_byte(&doorFrontTile[roomByte(roomNumber, 1 + door) & 0b00000011]);
 }
 
 int setCurrentRoomY(byte currentTile)
@@ -358,10 +334,6 @@ int offsetYAfterDoor(byte currentTile)
 
 /////////////////  DRAW ROOM    ///////////////////
 ///////////////////////////////////////////////////
-void drawNothing()
-{
-}
-
 void drawFloor()
 {
   bool menu = gameState < STATE_GAME_PLAYING;
@@ -530,11 +502,11 @@ void drawRoom()
 
 // door z-slots: lintel, big-post, GAP, small-post, closed  — do not move the GAP
 PROGMEM const byte doorSlot[] = { 0, 5, 35, 40 };
+PROGMEM const byte doorGapIn[]  = { 2, 7, 37, 42 };
+PROGMEM const byte doorGapOut[] = { 37, 37, 2, 7 };
 
-void checkOrderOfObjects(byte roomNumber, byte currentLevel)
+void checkOrderOfObjects()
 {
-  (void)roomNumber;
-  (void)currentLevel;
   // clear out the itemsOrder
   memset(itemsOrder, EMPTY_PLACE, SIZE_OF_ITEMSORDER);
 
@@ -570,45 +542,34 @@ void checkOrderOfObjects(byte roomNumber, byte currentLevel)
   }
   else
   {
-    switch (player.characteristics & 0b00000011)
-    {
-      case NORTH:
-        if (bitRead(player.characteristics, DROID_GOES_THROUGH_DOOR_AT_BIT_5)) itemsOrder[2] = PLAYER_DROID;
-        if (bitRead(player.characteristics, DROID_COMES_OUT_DOOR_AT_BIT_6)) itemsOrder[37] = PLAYER_DROID;
-        break;
-      case EAST:
-        if (bitRead(player.characteristics, DROID_GOES_THROUGH_DOOR_AT_BIT_5)) itemsOrder[7] = PLAYER_DROID;
-        if (bitRead(player.characteristics, DROID_COMES_OUT_DOOR_AT_BIT_6)) itemsOrder[37] = PLAYER_DROID;
-        break;
-      case SOUTH:
-        if (bitRead(player.characteristics, DROID_GOES_THROUGH_DOOR_AT_BIT_5)) itemsOrder[37] = PLAYER_DROID;
-        if (bitRead(player.characteristics, DROID_COMES_OUT_DOOR_AT_BIT_6)) itemsOrder[2] = PLAYER_DROID;
-        break;
-      case WEST:
-        if (bitRead(player.characteristics, DROID_GOES_THROUGH_DOOR_AT_BIT_5)) itemsOrder[42] = PLAYER_DROID;
-        if (bitRead(player.characteristics, DROID_COMES_OUT_DOOR_AT_BIT_6)) itemsOrder[7] = PLAYER_DROID;
-        break;
-    }
+    byte d = player.characteristics & 0b00000011;
+    if (bitRead(player.characteristics, DROID_GOES_THROUGH_DOOR_AT_BIT_5))
+      itemsOrder[pgm_read_byte(&doorGapIn[d])] = PLAYER_DROID;
+    if (bitRead(player.characteristics, DROID_COMES_OUT_DOOR_AT_BIT_6))
+      itemsOrder[pgm_read_byte(&doorGapOut[d])] = PLAYER_DROID;
   }
 }
 
 void drawNumbers(byte x, byte y, unsigned long numbers, byte width)
 {
   // HUD digits use the same 3-column ticker font as the scrolling text
-  char buf[8];
-  ltoa(numbers, buf, 10);
-  byte charLen = strlen(buf);
-  while (charLen < width && charLen < 7)
+  byte digits[7];
+  byte charLen = 0;
+  if (numbers == 0)
+    digits[charLen++] = 0;
+  else
   {
-    memmove(buf + 1, buf, charLen + 1);
-    buf[0] = '0';
-    charLen++;
+    while (numbers && charLen < 7)
+    {
+      digits[charLen++] = numbers % 10;
+      numbers /= 10;
+    }
   }
+  while (charLen < width && charLen < 7)
+    digits[charLen++] = 0;
   for (byte i = 0; i < charLen; i++)
   {
-    byte digit = buf[i] - '0';
-    if (digit > 9) digit = 0;
-    byte fr = digit * 3 + 1;
+    byte fr = digits[charLen - 1 - i] * 3 + 1;
     for (byte c = 0; c < 3; c++)
       sprites.drawSelfMasked(x + (4 * i) + c, y, font, fr + c);
   }

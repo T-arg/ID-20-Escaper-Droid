@@ -15,8 +15,7 @@ void isoStep(int &x, int &y, byte dir)
 
 boolean hitBorders(int objectX, int objectY, int directionFacing, bool playerOrEnemy)
 {
-  if (directionFacing < 0) directionFacing = 3;
-  if (directionFacing > 3) directionFacing = 0;
+  directionFacing &= 3;
   switch (directionFacing)
   {
     case NORTH:
@@ -36,35 +35,19 @@ boolean hitBorders(int objectX, int objectY, int directionFacing, bool playerOrE
 }
 
 void playerChecksAndOpensDoor(byte direction)
-{//
-                                          // NORTH = 0 
-  if ((player.assets & 0b00011000) && (checkIfLevelDoor() != direction))
-  {
-    player.assets -= 0b00001000;
-    scorePlayer += SCORE_OPEN_DOOR;
-    bitClear(stageRoom[currentRoom].doorsClosedActive, direction);
-  }
-  else if (checkIfLevelDoor() != direction)
-  {
-    play_SFX(SFX_DOOR);
-    loadAndFillMessage(7);
-    setTicker = TEXT_BLINK_SCROLL_RIGHT;
-    showTicker = TRUE;
-  }
-}
-
-void playerChecksAndOpensLevelDoor(byte direction)
 {
-  if ((player.assets & 0B00100000) && (checkIfLevelDoor() == direction))
+  bool isLevel = (checkIfLevelDoor() == direction);
+  byte need = isLevel ? 0b00100000 : 0b00001000;
+  if (player.assets & (isLevel ? 0b00100000 : 0b00011000))
   {
-    player.assets -= 0b00100000;
-    scorePlayer += SCORE_LEVEL_DOOR;
+    player.assets -= need;
+    scorePlayer += isLevel ? SCORE_LEVEL_DOOR : SCORE_OPEN_DOOR;
     bitClear(stageRoom[currentRoom].doorsClosedActive, direction);
   }
-  else if (checkIfLevelDoor() == direction)
+  else
   {
     play_SFX(SFX_DOOR);
-    loadAndFillMessage(8);
+    loadAndFillMessage(isLevel ? 8 : 7);
     setTicker = TEXT_BLINK_SCROLL_RIGHT;
     showTicker = TRUE;
   }
@@ -72,48 +55,15 @@ void playerChecksAndOpensLevelDoor(byte direction)
 
 void setPlayerWalkingThroughDoor()
 {
-  switch (player.characteristics & 0b00000011)
+  byte dir = player.characteristics & 0b00000011;
+  byte tile = pgm_read_byte(&doorFrontTile[dir]);
+  if ((player.isOnTile == tile) &&
+      (bitRead(stageRoom[currentRoom].doorsClosedActive, dir + UPPERBIT_OFFSET)) &&
+      (!bitRead(stageRoom[currentRoom].doorsClosedActive, dir)))
   {
-    case NORTH:
-      if ((player.isOnTile == TILE_INFRONT_DOOR_NORTH) &&
-          (bitRead(stageRoom[currentRoom].doorsClosedActive, NORTH_DOOR_EXISTS)) &&
-          (!bitRead(stageRoom[currentRoom].doorsClosedActive, NORTH_DOOR_IS_CLOSSED)))
-      {
-        bitSet (player.characteristics, DROID_GOES_THROUGH_DOOR_AT_BIT_5);
-        player.x = translateTileToX(2);
-        player.y = translateTileToY(2) + currentRoomY;
-      }
-      break;
-    case EAST:
-      if ((player.isOnTile == TILE_INFRONT_DOOR_EAST) &&
-          (bitRead(stageRoom[currentRoom].doorsClosedActive, EAST_DOOR_EXISTS)) &&
-          (!bitRead(stageRoom[currentRoom].doorsClosedActive, EAST_DOOR_IS_CLOSSED)))
-      {
-        bitSet (player.characteristics, DROID_GOES_THROUGH_DOOR_AT_BIT_5);
-        player.x = translateTileToX(10);
-        player.y = translateTileToY(10) + currentRoomY;
-      }
-      break;
-    case SOUTH:
-      if ((player.isOnTile == TILE_INFRONT_DOOR_SOUTH) &&
-          (bitRead(stageRoom[currentRoom].doorsClosedActive, SOUTH_DOOR_EXISTS)) &&
-          (!bitRead(stageRoom[currentRoom].doorsClosedActive, SOUTH_DOOR_IS_CLOSSED)))
-      {
-        bitSet (player.characteristics, DROID_GOES_THROUGH_DOOR_AT_BIT_5);
-        player.x = translateTileToX(22);
-        player.y = translateTileToY(22) + currentRoomY;
-      }
-      break;
-    case WEST:
-      if ((player.isOnTile == TILE_INFRONT_DOOR_WEST) &&
-          (bitRead(stageRoom[currentRoom].doorsClosedActive, WEST_DOOR_EXISTS)) &&
-          (!bitRead(stageRoom[currentRoom].doorsClosedActive, WEST_DOOR_IS_CLOSSED)))
-      {
-        bitSet (player.characteristics, DROID_GOES_THROUGH_DOOR_AT_BIT_5);
-        player.x = translateTileToX(14);
-        player.y = translateTileToY(14) + currentRoomY;
-      }
-      break;
+    bitSet(player.characteristics, DROID_GOES_THROUGH_DOOR_AT_BIT_5);
+    player.x = translateTileToX(tile);
+    player.y = translateTileToY(tile) + currentRoomY;
   }
 }
 
@@ -147,8 +97,7 @@ byte tileIsOccupied(byte tileTesting, bool playerOrEnemy, bool enemyTwo)
 
 boolean hitObjects (int objectX, int objectY, int directionFacing, bool playerOrEnemy, bool enemy)
 {
-  if (directionFacing < 0) directionFacing = 3;
-  if (directionFacing > 3) directionFacing = 0;
+  directionFacing &= 3;
   switch (directionFacing)
   {
     case NORTH:
@@ -232,11 +181,6 @@ void checkObjectTypeAndAct()
   }
 }
 
-void playerTouchesHazard()
-{
-  playerLosesLife();
-}
-
 byte floorKind(byte floorSlot)
 {
   return elements[floorSlot].characteristics & 0b00000111;
@@ -277,7 +221,7 @@ void decideOnCollision()
   {
     case ENEMY_ONE:
     case ENEMY_TWO:
-      playerTouchesHazard();
+      playerLosesLife();
       break;
     case OBJECT:
       checkObjectTypeAndAct();
@@ -294,16 +238,11 @@ void decideOnCollision()
           // walking into a box just stops you; kick it with B
         }
         else if (kind == FLOOR_SPIKE)
-          playerTouchesHazard();
+          playerLosesLife();
         // pits no longer hurt the droid
       }
       break;
   }
-}
-
-void stepShot(int &sx, int &sy, byte dir)
-{
-  isoStep(sx, sy, dir);
 }
 
 void killEnemy(byte enemySlot)
@@ -384,30 +323,6 @@ bool resolveShotOnTile(int sx, int sy, byte dir, bool fromPlayer)
   return false;
 }
 
-void updatePlayerShot()
-{
-  if (!playerShot.active) return;
-  if (!arduboy.everyXFrames(2)) return;
-
-  stepShot(playerShot.x, playerShot.y, playerShot.dir);
-  playerShot.steps++;
-
-  // Actors every iso step so a moving target cannot slip between tile centres.
-  byte hit = shotHitsEnemyAt(playerShot.x, playerShot.y);
-  if (hit < 2)
-  {
-    killEnemy(hit);
-    deactivatePlayerShot();
-    return;
-  }
-
-  if (playerShot.steps < SHOT_STEPS_PER_TILE) return;
-  playerShot.steps = 0;
-
-  if (resolveShotOnTile(playerShot.x, playerShot.y, playerShot.dir, true))
-    deactivatePlayerShot();
-}
-
 void spawnEnemyShot(byte enemySlot)
 {
   if (enemyBulletActive) return;
@@ -419,32 +334,77 @@ void spawnEnemyShot(byte enemySlot)
   elements[ENEMY_BULLET].frame = 0;
 }
 
-void deactivateEnemyShot()
+void updateShot(bool fromPlayer)
 {
-  enemyBulletActive = false;
+  if (!(fromPlayer ? playerShot.active : enemyBulletActive)) return;
+  if (!arduboy.everyXFrames(2)) return;
+
+  int sx, sy;
+  byte dir, steps;
+  if (fromPlayer)
+  {
+    sx = playerShot.x;
+    sy = playerShot.y;
+    dir = playerShot.dir;
+    steps = playerShot.steps;
+  }
+  else
+  {
+    sx = elements[ENEMY_BULLET].x;
+    sy = elements[ENEMY_BULLET].y;
+    dir = (elements[ENEMY_BULLET].characteristics & 0b00011000) >> 3;
+    steps = elements[ENEMY_BULLET].frame;
+  }
+
+  isoStep(sx, sy, dir);
+  steps++;
+
+  bool done = false;
+  if (fromPlayer)
+  {
+    byte hit = shotHitsEnemyAt(sx, sy);
+    if (hit < 2)
+    {
+      killEnemy(hit);
+      done = true;
+    }
+  }
+  else if (shotHitsPlayerAt(sx, sy))
+  {
+    playerLosesLife();
+    done = true;
+  }
+
+  if (!done && steps >= SHOT_STEPS_PER_TILE)
+  {
+    steps = 0;
+    if (resolveShotOnTile(sx, sy, dir, fromPlayer)) done = true;
+  }
+
+  if (fromPlayer)
+  {
+    playerShot.x = sx;
+    playerShot.y = sy;
+    playerShot.steps = steps;
+    if (done) playerShot.active = false;
+  }
+  else
+  {
+    elements[ENEMY_BULLET].x = sx;
+    elements[ENEMY_BULLET].y = sy;
+    elements[ENEMY_BULLET].frame = steps;
+    if (done) enemyBulletActive = false;
+  }
+}
+
+void updatePlayerShot()
+{
+  updateShot(true);
 }
 
 void updateEnemyShot()
 {
-  if (!enemyBulletActive) return;
-  if (!arduboy.everyXFrames(2)) return;
-
-  byte dir = (elements[ENEMY_BULLET].characteristics & 0b00011000) >> 3;
-  stepShot(elements[ENEMY_BULLET].x, elements[ENEMY_BULLET].y, dir);
-  elements[ENEMY_BULLET].frame++;
-
-  if (shotHitsPlayerAt(elements[ENEMY_BULLET].x, elements[ENEMY_BULLET].y))
-  {
-    playerLosesLife();
-    deactivateEnemyShot();
-    return;
-  }
-
-  if (elements[ENEMY_BULLET].frame < SHOT_STEPS_PER_TILE) return;
-  elements[ENEMY_BULLET].frame = 0;
-
-  if (resolveShotOnTile(elements[ENEMY_BULLET].x, elements[ENEMY_BULLET].y, dir, false))
-    deactivateEnemyShot();
+  updateShot(false);
 }
 
 #endif

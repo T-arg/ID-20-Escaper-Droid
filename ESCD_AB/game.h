@@ -17,7 +17,7 @@ void stateMenuPlay()
 
 void stateGamePlaying()
 {
-  checkOrderOfObjects(currentRoom, level);
+  checkOrderOfObjects();
   drawRoom();
   if (!bitRead(player.characteristics, 5))
   {
@@ -31,13 +31,13 @@ void stateGamePlaying()
     }
     else 
     {
-      player.isOnTile = goToTile(currentRoom, level);
+      player.isOnTile = goToTile(currentRoom);
       currentRoomY = setCurrentRoomY(player.isOnTile);
-      currentRoom = goToRoom(currentRoom, level);
+      currentRoom = goToRoom(currentRoom);
       player.x = translateTileToX (player.isOnTile) + offsetXAfterDoor(player.isOnTile);
       player.y = translateTileToY (player.isOnTile) + offsetYAfterDoor(player.isOnTile) + currentRoomY ;
       player.steps = 0;
-      enterRoom(currentRoom, level);
+      enterRoom(currentRoom);
       bitClear (player.characteristics, 5);
       bitSet (player.characteristics, 6);
       gameState = STATE_GAME_NEXT_ROOM;
@@ -57,7 +57,7 @@ void stateGamePlaying()
 
 void stateGameNextRoom()
 {
-  checkOrderOfObjects(currentRoom, level);
+  checkOrderOfObjects();
   drawRoom();
 
   {
@@ -91,8 +91,8 @@ void stateGameNextLevel()
     currentRoomY = ROOM_DRAWING_OFFSET;
     player.x = translateTileToX (player.isOnTile);
     player.y = translateTileToY (player.isOnTile) + currentRoomY ;
-    buildRooms(level);
-    enterRoom(currentRoom, level);
+    buildRooms();
+    enterRoom(currentRoom);
     statePrepForPause();
     gameState = STATE_GAME_PAUSE;
   }
@@ -146,7 +146,7 @@ void stateGameTransporting()
     player.x = translateTileToX (player.isOnTile) ;
     player.y = translateTileToY (player.isOnTile) + currentRoomY ;
     player.steps = 0;
-    enterRoom(currentRoom, level);
+    enterRoom(currentRoom);
   }
 }
 

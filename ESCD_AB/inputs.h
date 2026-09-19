@@ -15,13 +15,6 @@ PROGMEM const unsigned char buttonScheme[] = {
 
 PROGMEM const int8_t dirTileOffset[] = { -5, -1, 5, 1 };
 
-PROGMEM const byte doorTile[] = {
-  TILE_INFRONT_DOOR_NORTH,
-  TILE_INFRONT_DOOR_EAST,
-  TILE_INFRONT_DOOR_SOUTH,
-  TILE_INFRONT_DOOR_WEST
-};
-
 void checkInputs()
 {
   if (arduboy.everyXFrames(2))
@@ -66,17 +59,14 @@ void checkInputs()
 
     byte dir = player.characteristics & 0b00000011;
 
-    if (player.isOnTile == pgm_read_byte(&doorTile[dir]))
-    {
-      playerChecksAndOpensLevelDoor(dir);
-      playerChecksAndOpensDoor(dir); 
-    }
+    if (player.isOnTile == pgm_read_byte(&doorFrontTile[dir]))
+      playerChecksAndOpensDoor(dir);
 
     byte objType = elements[OBJECT].characteristics & 0b00000111;
     byte objTile = (elements[OBJECT].characteristics & 0b11111000) >> 3;
     int8_t neededTile = player.isOnTile + (int8_t)pgm_read_byte(&dirTileOffset[dir]);
 
-    bool usedAction = (player.isOnTile == pgm_read_byte(&doorTile[dir]));
+    bool usedAction = (player.isOnTile == pgm_read_byte(&doorFrontTile[dir]));
 
     if (objTile == neededTile)
     {

@@ -55,6 +55,8 @@ struct Element
 Element elements[9];
 bool enemyBulletActive = false;
 
+void drawShot(int sx, int sy);
+
 void drawEnemies(bool i)
 {
   byte ch = elements[i].characteristics;
@@ -77,8 +79,7 @@ void drawFloor(byte floor)
 
 void drawBulletEnemy()
 {
-  if (!enemyBulletActive) return;
-  sprites.drawPlusMask(elements[ENEMY_BULLET].x + 4, elements[ENEMY_BULLET].y + currentRoomY + 6, elements_plus_mask, 18);
+  if (enemyBulletActive) drawShot(elements[ENEMY_BULLET].x, elements[ENEMY_BULLET].y);
 }
 
 #endif

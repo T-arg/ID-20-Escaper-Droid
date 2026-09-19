@@ -65,11 +65,6 @@ struct Shot
 
 Shot playerShot;
 
-void deactivatePlayerShot()
-{
-  playerShot.active = false;
-}
-
 void spawnPlayerShot()
 {
   if (playerShot.active) return;
@@ -92,29 +87,18 @@ void songSpeedChange()
 void walkThroughDoor()
 {
   if (bitRead(player.characteristics, DROID_GOES_THROUGH_DOOR_AT_BIT_5) || bitRead(player.characteristics, DROID_COMES_OUT_DOOR_AT_BIT_6)) player.steps++;
-  switch (player.characteristics & 0b00000011)
+  byte dir = player.characteristics & 0b00000011;
+  if (dir > EAST)
   {
-    case NORTH:
-      if (currentRoomY < 0) currentRoomY++;
-      else player.y -= 1;
-      player.x -= 2;
-      break;
-    case EAST:
-      if (currentRoomY < 0)currentRoomY++;
-      else player.y -= 1;
-      player.x += 2;
-      break;
-    case SOUTH:
-      if (currentRoomY > MAX_ROOM_Y_SCROLLING)currentRoomY--;
-      else player.y += 1;
-      player.x += 2;
-      break;
-    case WEST:
-      if (currentRoomY > MAX_ROOM_Y_SCROLLING)currentRoomY--;
-      else player.y += 1;
-      player.x -= 2;
-      break;
+    if (currentRoomY > MAX_ROOM_Y_SCROLLING) currentRoomY--;
+    else player.y += 1;
   }
+  else
+  {
+    if (currentRoomY < 0) currentRoomY++;
+    else player.y -= 1;
+  }
+  player.x += (dir == EAST || dir == SOUTH) ? 2 : -2;
 }
 
 void playerLosesLife()
@@ -193,10 +177,14 @@ void drawPlayer()
   }
 }
 
+void drawShot(int sx, int sy)
+{
+  sprites.drawPlusMask(sx + 4, sy + currentRoomY + 6, elements_plus_mask, 18);
+}
+
 void drawBulletPlayer()
 {
-  if (!playerShot.active) return;
-  sprites.drawPlusMask(playerShot.x + 4, playerShot.y + currentRoomY + 6, elements_plus_mask, 18);
+  if (playerShot.active) drawShot(playerShot.x, playerShot.y);
 }
 
 #endif

@@ -75,7 +75,6 @@ byte currentRoom;
 byte currentlyOnTestingTile;
 byte testingTile;
 int currentRoomY;
-byte amountOfTransporters;
 byte buttonSchemeOffset = FALSE;
 byte exitRoomLocation = 0;
 byte setTicker;
