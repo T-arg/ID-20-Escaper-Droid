@@ -61,7 +61,6 @@ struct Room {
     byte elementsActive;
     byte roomToTransportTo;
     byte roomNumberInfluencing;
-    byte roomNumberFromInfluencer;
     byte elementsInfluenced;
 
     // doorsClosedActive — this byte holds all the 4 doors characteristics for each room
@@ -99,16 +98,12 @@ struct Room {
     // roomNumberInfluencing
     //                        |||||||└->0  \
     //                        ||||||└-->1   |
-    //                        |||||└--->2   | these 6 bits are used for the roomnumber where the elements are influenced
-    //                        ||||└---->3   |
+    //                        |||||└--->2   | bits 0-5: room whose elements this switch toggles
+    //                        ||||└---->3   | (the old separate "from room" level byte is gone)
     //                        |||└----->4   |
     //                        ||└------>5  /
     //                        |└------->6 NOT USED
-    //                        └-------->7 NOT USED
-    //
-    // roomNumberFromInfluencer
-    //                           bits 0-6 unused (the old "from room" level byte is gone)
-    //                           bit 7 = switch is ON (remembered when you leave the room)
+    //                        └-------->7 switch is ON (remembered when you leave the room)
     //
     // elementsInfluenced
     //                     ||||||||
@@ -183,7 +178,7 @@ void buildRooms()
       stageRoom[roomNumber].elementsInfluenced = lvByte(influenceDataAtByte + influenceDataCounter + 1);
       influenceDataCounter += 2;
       if (objType == SWITCH_ON)
-        bitSet(stageRoom[roomNumber].roomNumberFromInfluencer, 7);
+        bitSet(stageRoom[roomNumber].roomNumberInfluencing, 7);
     }
   }
 }
@@ -283,7 +278,7 @@ void enterRoom(byte roomNumber)
   }
   if ((elements[OBJECT].characteristics & 0b00000111) >= SWITCH_OFF)
   {
-    if (bitRead(stageRoom[roomNumber].roomNumberFromInfluencer, 7))
+    if (bitRead(stageRoom[roomNumber].roomNumberInfluencing, 7))
       bitSet(elements[OBJECT].characteristics, 0);
     else
       bitClear(elements[OBJECT].characteristics, 0);
