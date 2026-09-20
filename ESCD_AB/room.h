@@ -187,7 +187,7 @@ void buildRooms()
 byte checkIfLevelDoor()
 {
   byte test = lvByte(LEVEL_DOOR_DATA_START_AT_BYTE);
-  if (currentRoom == ((test & 0b1111100)>>2)) return (test & 0b00000011);
+  if (currentRoom == (test >> 2)) return (test & 0b00000011);
   return 255;
 }
 

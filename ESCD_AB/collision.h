@@ -36,7 +36,10 @@ boolean hitBorders(int objectX, int objectY, int directionFacing, bool playerOrE
 
 void playerChecksAndOpensDoor(byte direction)
 {
-  bool isLevel = (checkIfLevelDoor() == direction);
+  // Black card: the designated level door, or the closed door that leads into the exit room.
+  // White cards only open ordinary closed doors.
+  byte destRoom = (roomByte(currentRoom, 1 + direction) >> 2) & 0x3f;
+  bool isLevel = (checkIfLevelDoor() == direction) || (destRoom == exitRoomLocation);
   byte need = isLevel ? 0b00100000 : 0b00001000;
   if (player.assets & (isLevel ? 0b00100000 : 0b00011000))
   {
