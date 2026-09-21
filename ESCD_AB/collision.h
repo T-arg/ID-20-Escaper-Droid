@@ -13,6 +13,9 @@ void isoStep(int &x, int &y, byte dir)
   y += (dir > EAST) ? 1 : -1;
 }
 
+bool boxerFacesPlayer(byte slot);
+void kickPlayer(byte dir);
+
 boolean hitBorders(int objectX, int objectY, int directionFacing, bool playerOrEnemy)
 {
   directionFacing &= 3;
@@ -119,7 +122,15 @@ boolean hitObjects (int objectX, int objectY, int directionFacing, bool playerOr
   byte test = tileIsOccupied(testingTile, playerOrEnemy, enemy);
   if (test > 0)
   {
-    if (test == PLAYER_DROID) playerLosesLife();
+    if (test == PLAYER_DROID)
+    {
+      // moving enemy walked into the droid
+      if (((elements[enemy].characteristics & 0b00000111) == ENEMY_BOX) &&
+          boxerFacesPlayer(enemy))
+        kickPlayer((elements[enemy].characteristics & 0b00011000) >> 3);
+      else
+        playerLosesLife();
+    }
     return true;
   }
   else return false;
@@ -218,13 +229,70 @@ boolean tryPushBox(byte slot, byte dir)
   return true;
 }
 
+PROGMEM const int8_t kickTileOffset[] = { -5, -1, 5, 1 };
+
+bool boxerFacesPlayer(byte slot)
+{
+  byte et = tileFromXY(elements[slot].x, elements[slot].y);
+  if (et >= 25 || player.isOnTile >= 25) return false;
+  byte dir = (elements[slot].characteristics & 0b00011000) >> 3;
+  int8_t front = (int8_t)et + (int8_t)pgm_read_byte(&kickTileOffset[dir]);
+  return (front == (int8_t)player.isOnTile);
+}
+
+void kickPlayer(byte dir)
+{
+  dir &= 3;
+  byte src = player.isOnTile;
+  if (src >= 25) return;
+  byte col = src % 5;
+  if ((dir == NORTH && src < 5) ||
+      (dir == SOUTH && src >= 20) ||
+      (dir == EAST  && col == 0) ||
+      (dir == WEST  && col == 4))
+    return;
+
+  int8_t dest = (int8_t)src + (int8_t)pgm_read_byte(&kickTileOffset[dir]);
+  if (dest < 0 || dest > 24) return;
+
+  byte occ = itemsOrder[dest + ITEMS_ORDER_TILES_START];
+  if (occ >= FLOOR_ONE && occ <= FLOOR_FIVE)
+  {
+    byte kind = floorKind(occ);
+    if (kind == FLOOR_BOX || kind == FLOOR_PIRAMIDE) return;
+  }
+
+  player.isOnTile = dest;
+  player.x = translateTileToX(dest);
+  player.y = translateTileToY(dest) + currentRoomY;
+  play_SFX(SFX_DOOR);
+
+  bool hurt = false;
+  if (occ == ENEMY_ONE || occ == ENEMY_TWO) hurt = true;
+  else if (occ >= FLOOR_ONE && occ <= FLOOR_FIVE && floorKind(occ) == FLOOR_SPIKE)
+    hurt = true;
+  else
+  {
+    for (byte i = 0; i < 2; i++)
+    {
+      if (!bitRead(stageRoom[currentRoom].elementsActive, 7 - i)) continue;
+      if (tileFromXY(elements[i].x, elements[i].y) == dest) { hurt = true; break; }
+    }
+  }
+  if (hurt) playerLosesLife();
+}
+
 void decideOnCollision()
 {
   switch (currentlyOnTestingTile)
   {
     case ENEMY_ONE:
     case ENEMY_TWO:
-      playerLosesLife();
+      if (((elements[currentlyOnTestingTile].characteristics & 0b00000111) == ENEMY_BOX) &&
+          boxerFacesPlayer(currentlyOnTestingTile))
+        kickPlayer((elements[currentlyOnTestingTile].characteristics & 0b00011000) >> 3);
+      else
+        playerLosesLife();
       break;
     case OBJECT:
       checkObjectTypeAndAct();
