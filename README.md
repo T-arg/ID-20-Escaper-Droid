@@ -1,62 +1,16 @@
 # ID-20-Escaper-Droid
-Code for the game Escaper Droid for Arduboy
+![Image](https://github.com/T-arg/ID-20-Escaper-Droid/blob/master/art/banner-ID-20.png)
 
-# small roadmap
+Escaper Droid:
 
-- [ ] Action button
-    - [x] Check collision type
-    - [x] return collision type
-    - [ ] Action according to type
-        - [x] Open Closed room door
-        - [x] Open Closed level door
-        - [ ] Switch ON/OFF
-        - [ ] Shoot bullet
-        - [x] Do nothing
-- [ ] Change pause screen
-    - [x] Remove pause bitmap
-    - [x] Show Empty room
-    - [x] Show Assets
-    - [ ] Show Score
-    - [ ] Show word PAUSE (or maybe a map)
-    - [ ] Maybe show a map 
-- [ ] Change intro logo
-    - [x] Remove Team arg bitmap
-    - [x] Add new bitmap
-    - [x] Add small sound
-    - [x] replace the placeholder sound with something cool
-- [x] Change in code intro comments
-- [ ] Change Droid in transport modus
-    - [x] Make the droid turn around
-    - [x] add bitmap with circles around the droid
-    - [x] make the bitmap circles move upwards
-    - [ ] change the transport modus from walk against, to press action button
-- [ ] Add soundfx
-    - [ ] Shooting
-    - [ ] Transporting
-- [ ] Change GAME OVER screen
-    - [x] Remove game over bitmap.
-    - [ ] Show the droid dying, turning around.
-    - [x] Show dead droid (new bitmap)
-    - [ ] Add little game over song
-    - [ ] Show score
-- [ ] Add score to the game
-    - [x] Decide how to get points
-        - [ ] Next level
-        - [x] Find key
-        - [x] Use key
-    - [ ] Maybe a time element?
-- [ ] Option for changing the d-pad
-    - [x] Add an option to the config menu
-    - [x] Use definers in the code
-    - [x] Make the menu switch the layout type of the buttons
-- [ ] change the menu
-    - [x] remove the current menu
-    - [x] add new menu 
-        - [x] INFO
-        - [x] PLAY
-        - [x] CONF
-            - [x] BUTTONS SCHEMA A
-            - [x] BUTTONS SCHEMA B
-        - [x] SDFX
-            - [x] SOUND ON
-            - [x] SOUND OFF
+**Download latest Arduboy version and source :** 
+
+MADE by TEAM a.r.g. : https://T-arg.github.io/
+
+  STARTED by TEAM a.r.g.
+  2016 - JO3RI - STG
+
+  CONTINUED by TEAM a.r.g.
+  2026 - JO3RI - Onebit
+
+Game License: MIT : https://opensource.org/licenses/MIT
