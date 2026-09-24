@@ -130,6 +130,7 @@ void stateGameNextRoom()
 void stateGameNextLevel()
 {
   level++;
+  player.life = 3;
   EEPROM.write(OFFSET_LEVEL,level);
   if (level > AMOUNT_OF_LEVELS)
   {
