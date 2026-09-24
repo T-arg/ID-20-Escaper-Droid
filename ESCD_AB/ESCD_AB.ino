@@ -1,6 +1,6 @@
 /*
   Escaper Droid
-  Arduboy version 0.8.22
+  Arduboy version 0.8.25
   
   STARTED by TEAM a.r.g.
   2016 - JO3RI - STG
@@ -41,6 +41,8 @@ const FunctionPointer PROGMEM  mainGameLoop[] =
   stateGameOver,
   stateGameTransporting,
   stateGameFinished,
+  stateGameNew,
+  stateGameContinue,
 };
 
 
@@ -50,10 +52,10 @@ void setup()
   arduboy.audio.begin();
   arduboy.setFrameRate(45);
   if (!arduboy.audio.enabled()) soundMode = 3;
-  else
+  else ATM.play(introMusic);
+  if ((EEPROM.read(OFFSET_ESCD_START) == GAME_ID) && (EEPROM.read(OFFSET_ESCD_END) == GAME_ID))
   {
-    ATM.play(introMusic);
-    //ATM.play(badNews);
+    buttonSchemeOffset = EEPROM.read(OFFSET_BUTTONS);
   }
 }
 

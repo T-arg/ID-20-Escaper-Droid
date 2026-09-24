@@ -134,7 +134,7 @@ void updatePlayer()
   else if (bitRead(player.characteristics, DROID_DYING_AT_BIT_4))
   {
     currentRoomY = ROOM_DRAWING_OFFSET;
-    loadAndFillMessage(5);
+    loadAndFillMessage(6);
     addNumber(scorePlayer,22,6);
     setTicker = TEXT_SCROLL_LEFT;
     showTicker = TRUE;

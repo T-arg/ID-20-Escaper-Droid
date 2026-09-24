@@ -5,14 +5,66 @@
 #include "inputs.h"
 #include "text.h"
 
-void stateMenuPlay()
+
+void stateGameNew()
 {
-  //ATM.stop();
+  level = LEVEL_TO_START_WITH - 1;
   scorePlayer = 0;
   player.set();
-  // 1-based: NEXT_LEVEL increments, then buildRooms uses levels[level-1]
-  level = LEVEL_TO_START_WITH - 1;
+  EEPROM.write(OFFSET_ESCD_START,GAME_ID);
+  EEPROM.write(OFFSET_LEVEL, level);
+  EEPROM.write(OFFSET_BUTTONS,buttonSchemeOffset);
+  EEPROM.write(OFFSET_ESCD_END,GAME_ID);
   gameState = STATE_GAME_NEXT_LEVEL;
+  
+}
+
+void stateGameContinue()
+{
+  scorePlayer = 0;
+  player.set();
+  gameState = STATE_GAME_NEXT_LEVEL;
+}
+
+void stateMenuPlay()
+{
+  if ((EEPROM.read(OFFSET_ESCD_START) == GAME_ID) && (EEPROM.read(OFFSET_ESCD_END) == GAME_ID))
+  {
+    level = EEPROM.read(OFFSET_LEVEL);
+    drawTitleScreen();
+    drawFloor();
+    // " BUTTON SCHEME    N<>S  E<>W"  N<>S @ char 18 → x72, E<>W @ char 24 → x96
+    drawSelectedWordMask(newGameOffset ? 96 : 72);
+    if (arduboy.justPressed(RIGHT_BUTTON))
+    {
+      play_SFX(SFX_MENU);
+      newGameOffset = 4;
+      //gameState = STATE_GAME_CONTINUE;
+    }
+    if (arduboy.justPressed(LEFT_BUTTON))
+    {
+      play_SFX(SFX_MENU);
+      newGameOffset = 0;
+      //gameState = STATE_GAME_NEW;
+    }
+    if (arduboy.justPressed(B_BUTTON))
+    {
+      play_SFX(SFX_PICKUP);
+      gameState = (newGameOffset ? STATE_GAME_CONTINUE : STATE_GAME_NEW);
+    }
+    if (arduboy.justPressed(A_BUTTON))
+    {
+      play_SFX(SFX_PICKUP);
+      statePrepForMainMenu();
+    }
+  }
+  
+  else
+  {
+    gameState = STATE_GAME_NEW;
+  }
+
+  // 1-based: NEXT_LEVEL increments, then buildRooms uses levels[level-1]
 }
 
 void stateGamePlaying()
@@ -78,9 +130,10 @@ void stateGameNextRoom()
 void stateGameNextLevel()
 {
   level++;
+  EEPROM.write(OFFSET_LEVEL,level);
   if (level > AMOUNT_OF_LEVELS)
   {
-    loadAndFillMessage(6);
+    loadAndFillMessage(7);
     addNumber(scorePlayer,24,6);
     gameState = STATE_GAME_FINISHED;
   }

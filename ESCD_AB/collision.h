@@ -50,7 +50,7 @@ void playerChecksAndOpensDoor(byte direction)
   else
   {
     play_SFX(SFX_DOOR);
-    loadAndFillMessage(isLevel ? 8 : 7);
+    loadAndFillMessage(isLevel ? 9 : 8);
     setTicker = TEXT_BLINK_SCROLL_RIGHT;
     showTicker = TRUE;
   }

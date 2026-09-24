@@ -38,24 +38,24 @@ PROGMEM const char textMessage[] = // each message max 30 characters including s
 //"//////////////////////////////\0"
   "    CONF SDFX   INFO PLAY\0"           //00
   " BUTTON SCHEME    N<>S  E<>W\0"        //01
-//  " MUSIC SOUND       ON   OFF\0"         //02
   "    MSFX MUSC   SDFX MUTE\0"           //02
   " CREATED BY STG ONEBIT JO3RI\0"        //03
-  "   LEVEL         SCORE:\0"             //04
-  "GAME OVER  :<  SCORE:\0"               //05
-  "DROID ESCAPED :>  SCORE:\0"            //06
-  "ACCESS DENIED: USE WHITE CARD\0"       //07
-  "ACCESS DENIED: USE BLACK CARD\0"       //08
-  "DROID USED A TELEPORT GET HIM\0"       //09
-  "WATCH IT DROID FOUND A SWITCH\0"       //10
-  "ALERT ALERT DROID ESCAPING\0"          //11
-  "GET THAT DROID NOW\0"                  //12  
-  "DO NOT LET THAT DROID ESCAPE\0"        //13
-  "IT STOLE THE DEADSTAR PLANS\0"         //14
-  "THIS IS A NO SMOKING FACILITY\0"       //15
-  "AREA 51 IS IN LOCKDOWN\0"              //16
-  "DROID Q3E3 PLEASE REPORT NOW\0"        //17
-  "THE EXIT IS THAT WAY ====>\0";         //18
+  " CONTINUE GAME    NEW   CONT\0"        //04
+  "   LEVEL         SCORE:\0"             //05
+  "GAME OVER  :<  SCORE:\0"               //06
+  "DROID ESCAPED :>  SCORE:\0"            //07
+  "ACCESS DENIED: USE WHITE CARD\0"       //08
+  "ACCESS DENIED: USE BLACK CARD\0"       //09
+  "DROID USED A TELEPORT GET HIM\0"       //11
+  "WATCH IT DROID FOUND A SWITCH\0"       //12
+  "ALERT ALERT DROID ESCAPING\0"          //13
+  "GET THAT DROID NOW\0"                  //14  
+  "DO NOT LET THAT DROID ESCAPE\0"        //15
+  "IT STOLE THE DEADSTAR PLANS\0"         //16
+  "THIS IS A NO SMOKING FACILITY\0"       //17
+  "AREA 51 IS IN LOCKDOWN\0"              //18
+  "DROID Q3E3 PLEASE REPORT NOW\0"        //19
+  "THE EXIT IS THAT WAY ====>\0";         //20
 
 
 

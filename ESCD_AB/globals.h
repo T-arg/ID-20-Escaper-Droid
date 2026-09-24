@@ -12,6 +12,12 @@
 
 // constants /////////////////////////////////////////////////////////////////
 
+//define EEPROM
+#define OFFSET_ESCD_START             (EEPROM_STORAGE_SPACE_START + 73)
+#define OFFSET_LEVEL                  (OFFSET_ESCD_START + sizeof(byte))
+#define OFFSET_BUTTONS                (OFFSET_LEVEL + sizeof(byte))
+#define OFFSET_ESCD_END               (OFFSET_BUTTONS + sizeof(byte))
+
 //define menu states (on main menu)
 #define STATE_MENU_INTRO             5
 #define STATE_MENU_MAIN              0
@@ -26,7 +32,7 @@
 #define STATE_MENU_SELECT_INFO       2
 #define STATE_MENU_SELECT_PLAY       3
 
-//define game states (on main menu)
+//define game states (for the game)
 #define STATE_GAME_PLAYING           6
 #define STATE_GAME_NEXT_ROOM         7
 #define STATE_GAME_NEXT_LEVEL        8
@@ -34,6 +40,10 @@
 #define STATE_GAME_OVER              10
 #define STATE_GAME_TRANSPORTING      11
 #define STATE_GAME_FINISHED          12
+
+#define STATE_GAME_NEW               13
+#define STATE_GAME_CONTINUE          14
+
 
 //define facing directions
 #define NORTH                        0
@@ -76,6 +86,7 @@ byte currentlyOnTestingTile;
 byte testingTile;
 int currentRoomY;
 byte buttonSchemeOffset = FALSE;
+byte newGameOffset = FALSE;
 byte exitRoomLocation = 0;
 byte setTicker;
 bool showTicker;
@@ -86,14 +97,14 @@ bool objectHiddenThisVisit;  // ammo pickup hides until you leave the room
 void statePrepForPause()
 {
   setTicker = TEXT_BLINK;
-  loadAndFillMessage(4);
+  loadAndFillMessage(5);
   addNumber(level,9,2);
   addNumber(scorePlayer,23,6);
 }
 
 void statePrepForRoom()
 {
-  loadAndFillMessage(11+(currentRoom%8));
+  loadAndFillMessage(12+(currentRoom%8));
   setTicker = TEXT_SCROLL_LEFT;
   showTicker = TRUE;
   gameState = STATE_GAME_PLAYING;
