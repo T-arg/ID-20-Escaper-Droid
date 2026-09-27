@@ -158,17 +158,25 @@
       gap: 8px;
     }
 
-    .hexlink {
+    .hexlink,
+    .fullscreenlink {
       display: inline-flex;
       align-items: center;
+      gap: 6px;
       text-decoration: none;
       flex: 0 0 auto;
+      color: #5d4c4b;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 18px;
     }
 
-    .hexlink svg {
+    .hexlink svg,
+    .fullscreenlink svg {
       display: block;
       width: 18px;
       height: 18px;
+      flex-shrink: 0;
     }
 
     .ardutitle {
@@ -382,6 +390,7 @@
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path fill="#5d4c4b" d="M12 3a1 1 0 0 1 1 1v9.6l2.3-2.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L11 13.6V4a1 1 0 0 1 1-1zm-7 14a1 1 0 0 1 1 1v2h12v-2a1 1 0 1 1 2 0v3H4v-3a1 1 0 0 1 1-1z"/>
               </svg>
+              download
             </a>
             <a
               class="ardutitle"
@@ -390,24 +399,26 @@
               rel="noopener"
               title="Created by brow1067">Arduboy Simulator</a>
             <a
+              class="fullscreenlink"
               href="https://tiberiusbrown.github.io/Ardens/player.html?blah=https://raw.githubusercontent.com/T-arg/ID-20-Escaper-Droid/refs/heads/master/ESCD_AB/build/arduino.avr.leonardo/ESCD_AB.ino.hex&amp;g=none&amp;z=1&amp;palette=highcontrast"
               target="_blank"
               rel="noopener"
               title="Play fullscreen">
+              fullscreen
               <svg class="smallbuttons" viewBox="0 0 24 24" aria-hidden="true">
                 <path fill="#5d4c4b" d="M4 4h7v2H6v5H4V4zm9 0h7v7h-2V6h-5V4zM4 13h2v5h5v2H4v-7zm14 0h2v7h-7v-2h5v-5z"/>
               </svg>
             </a>
           </div>
         </div>
-        <div class="bmc-wrap">
-          <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="TEAMarg" data-color="#5d4c4b" data-emoji="☕" data-font="Cookie" data-text="Cool game? Buy us a coffee" data-outline-color="#fefefd" data-font-color="#fefefd" data-coffee-color="#FFDD00"></script>
-        </div>
         <p class="kbd-hint">
           <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> move ·
           <kbd>A</kbd> / <kbd>Z</kbd> pause ·
           <kbd>B</kbd> / <kbd>S</kbd> / <kbd>X</kbd> action
         </p>
+        <div class="bmc-wrap">
+          <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="TEAMarg" data-color="#5d4c4b" data-emoji="☕" data-font="Cookie" data-text="Cool game? Buy us a coffee" data-outline-color="#fefefd" data-font-color="#fefefd" data-coffee-color="#FFDD00"></script>
+        </div>
       </div>
 
       <h2>The game</h2>
