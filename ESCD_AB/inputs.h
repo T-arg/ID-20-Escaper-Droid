@@ -46,6 +46,7 @@ void checkInputs()
   if (arduboy.justPressed(A_BUTTON))
   {
     statePrepForPause();
+    ATM.pause();
     gameState = STATE_GAME_PAUSE;
   }
 
@@ -60,6 +61,8 @@ void checkInputs()
     }
     if ((currentRoom == exitRoomLocation && player.isOnTile == TILE_IN_MIDDLE) || onExitDecal)
     {
+      ATM.pause();
+      ATM.playSfx(levelUp,0);
       gameState = STATE_GAME_NEXT_LEVEL;
       return;
     }
@@ -82,7 +85,7 @@ void checkInputs()
         bitSet(player.characteristics, DROID_TRANSPORTING_AT_BIT_7);
         gameState = STATE_GAME_TRANSPORTING;
         usedAction = true;
-        play_SFX(SFX_DOOR);
+        play_SFX(SFX_BEAMMEUPSCOTTY);
       }
       else if (objType > 5)
       {

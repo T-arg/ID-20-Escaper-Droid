@@ -40,7 +40,8 @@ Song menuSong[] = {     // total in song bytes =
 
 //"Track 0"    
 ATM_VOL(0),                // FX: SET VOLUME: volume = 0
-ATM_SET_TEMPO(36),               // SET song tempo: value = 36
+ATM_VOL(0),                // FX: SET VOLUME: volume = 0
+//ATM_SET_TEMPO(36),               // SET song tempo: value = 36
 ATM_STOP_CHAN,                   // FX: STOP CURRENT CHANNEL
    
 //"Track 1"   

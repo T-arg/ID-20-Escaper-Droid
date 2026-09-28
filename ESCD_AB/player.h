@@ -44,7 +44,26 @@ struct EscaperDroid
     void set()
     {
       characteristics = 0b00000110;
+      //                  ||||||||
+      //                  |||||||└->  0  | this 2 bits are used for direction
+      //                  ||||||└-->  1  | 00 = NORTH / 01 = EAST / 10 = SOUTH / 11 = WEST
+      //                  |||||└--->  2  The droid is visible                   (0 = false / 1 = true)
+      //                  ||||└---->  3  The droid is immune                    (0 = false / 1 = true)
+      //                  |||└----->  4  The droid is dying                     (0 = false / 1 = true)
+      //                  ||└------>  5  The droid is going through a door      (0 = false / 1 = true)
+      //                  |└------->  6  The droid is coming out a door         (0 = false / 1 = true)
+      //                  └-------->  7  the droid is transporting              (0 = false / 1 = true)
       assets = 0b01000000;
+      //         ||||||||
+      //         |||||||└->  0  \ 
+      //         ||||||└-->  1   | this 3 bits are used for amount of shots (0 - 7)
+      //         |||||└--->  2  /
+      //         ||||└---->  3  \
+      //         |||└----->  4   | this 2 bits are used for amount of white cards (0 - 3)
+      //         ||└------>  5  -- the droid has a black card                   (0 = false / 1 = true)
+      //         |└------->  6  -- the droid's battery meter is visible         (0 = false / 1 = true)
+      //         └-------->  7  -- RESERVED
+
       isOnTile = TILE_GAME_STARTS_ON;
       steps = 0;
       life = 3;

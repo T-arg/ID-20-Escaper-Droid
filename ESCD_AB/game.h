@@ -160,6 +160,7 @@ void stateGamePause()
   drawHUD();
   if (arduboy.justPressed(A_BUTTON | B_BUTTON))
   {
+    ATM.resume();
     statePrepForRoom();
   }
 }
