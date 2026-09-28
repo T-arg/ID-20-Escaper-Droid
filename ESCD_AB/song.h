@@ -5,55 +5,6 @@
 
 #define Song const uint8_t PROGMEM
 
-Song introMusic[] = {           // total amount of bytes used = 37
-  //                            // setup bytes 13
-  0x03,                         // Number of tracks
-
-  0x00, 0x00,                   // Address of track 0
-  0x03, 0x00,                   // Address of track 1
-  0x16, 0x00,                   // Address of track 2
-  
-  0x02,                         // Channel 0 entry track (PULSE)
-  0x01,                         // Channel 1 entry track (SQUARE)
-  0x00,                         // Channel 2 entry track (SAW)
-  0x00,                         // Channel 3 entry track (NOISE)
-
-  //"Track 0"                   // bytes used 3
-  0x40,0,                       // FX: SET VOLUME: volume = 0
-  0x9F,                         // FX: STOP CURRENT CHANNEL
-
-  //"track 3"                   // / bytes used 19
-  ATM_VOL(48),                  // FX: SET VOLUME: volume = 48
-  ATM_SET_TEMPO(24),
-  ATM_NOTE_C3,
-  ATM_DELAY(32),
-  ATM_SL_FRQ(8),
-  ATM_NOTE_C3,
-  ATM_DELAY(64),
-  ATM_SL_FRQ_OFF,
-  ATM_NOTE_C4,
-  ATM_DELAY(16),
-  ATM_SL_VOL(-4),
-  ATM_DELAY(32),
-  ATM_CUE(1),
-  0x9F,
-
-  //"track 4"                      // bytes used = 15
-  ATM_VOL(48),                     // FX: SET VOLUME: volume = 24
-  ATM_NOTE_C2,
-  ATM_DELAY(32),
-  ATM_SL_FRQ(12),
-  ATM_NOTE_C2,
-  ATM_DELAY(64),
-  ATM_SL_FRQ_OFF,
-  ATM_NOTE_C4,
-  ATM_DELAY(16),
-  ATM_SL_VOL(-4),
-  ATM_DELAY(16),
-  0x9F,
-};
-
-
 
 Song menuSong[] = {     // total in song bytes = 
 0x18,                   // Number of tracks
@@ -421,48 +372,48 @@ Song youDied[] = {              // total song in bytes = 64
   0x02,                         // Channel 3 entry track
 
   //"Track 0"
-  0x40, 80,                     // FX: SET VOLUME: volume = 80
-  0x9D, 14,                     // SET song tempo: value = 14
-  0x41, (uint8_t)-6,                     // FX: VOLUME SLIDE ON: steps = -6
-  0xFD, 63, 3,                  // REPEAT: count = 63 + 1 / track = 3
-  0x9F,                         // FX: STOP CURRENT CHANNEL
+  ATM_VOL(63),                  // FX: SET VOLUME: volume = 80
+  ATM_SET_TEMPO(14),            // SET song tempo: value = 14
+  ATM_SL_VOL(-6),               // FX: VOLUME SLIDE ON: steps = -6
+  ATM_REPEAT(63,3),             // REPEAT: count = 63 + 1 / track = 3
+  ATM_STOP_CHAN,                // FX: STOP CURRENT CHANNEL
 
   //"Track 1"
-  0x40, 48,                     // FX: SET VOLUME: volume = 48
-  0x41, (uint8_t)-1,                     // FX: VOLUME SLIDE ON: steps = -1
-  0xFD, 20, 4,                  // REPEAT: count = 20 + 1 / track = 4
-  0x9F,                         // FX: STOP CURRENT CHANNEL
+  ATM_VOL(48),                  // FX: SET VOLUME: volume = 48
+  ATM_SL_VOL(-1),               // FX: VOLUME SLIDE ON: steps = -1
+  ATM_REPEAT(20,4),             // REPEAT: count = 20 + 1 / track = 4
+  ATM_STOP_CHAN,                // FX: STOP CURRENT CHANNEL
 
   //"Track 2"
-  0x40, 0,                      // FX: SET VOLUME: volume = 0
-  0x9F,                         // FX: STOP CURRENT CHANNEL
+  ATM_VOL(0),                   // FX: SET VOLUME: volume = 0
+  ATM_STOP_CHAN,                // FX: STOP CURRENT CHANNEL
 
   //"Track 3"
-  0x00 + 43,                    // NOTE ON: note = 31
-  0x9F + 16,                    // DELAY: ticks = 32
-  0x00 + 50,                    // NOTE ON: note = 38
-  0x9F + 16,                    // DELAY: ticks = 32
-  0x00 + 46,                    // NOTE ON: note = 34
-  0x9F + 16,                    // DELAY: ticks = 32
-  0x00 + 46,                    // NOTE ON: note = 34
-  0x9F + 8,                     // DELAY: ticks = 16
-  0x00 + 45,                    // NOTE ON: note = 33
-  0x9F + 8,                     // DELAY: ticks = 16
-  0xFE,                         // RETURN
+  ATM_NOTE_F5_,                 // NOTE ON: note = F5_
+  ATM_DELAY(16),                // DELAY: ticks = 32
+  ATM_NOTE_C6_,                 // NOTE ON: note = C6_
+  ATM_DELAY(16),                // DELAY: ticks = 32
+  ATM_NOTE_A5,                  // NOTE ON: note = A5
+  ATM_DELAY(16),                // DELAY: ticks = 32
+  ATM_NOTE_A5,                  // NOTE ON: note = A5
+  ATM_DELAY(8),                 // DELAY: ticks = 16
+  ATM_NOTE_G5_,                 // NOTE ON: note = G5_
+  ATM_DELAY(8),                 // DELAY: ticks = 16
+  ATM_RETURN,                   // RETURN
 
   //"Track 4"
-  0xFC, 5,                      // GOTO track 5
-  0x4C, (uint8_t)-2,                     // FX: SET TRANSPOSITION: notes = -2
-  0xFC, 5,                      // GOTO track 5
-  0x4C, 2,                      // FX: SET TRANSPOSITION: notes = 2
-  0xFC, 5,                      // GOTO track 5
-  0x4D,                         // FX: TRANSPOSITION OFF
-  0xFE,                         // RETURN
+  ATM_GOTO(5),                  // GOTO track 5
+  ATM_SET_TRA(-2),              // FX: SET TRANSPOSITION: notes = -2
+  ATM_GOTO(5),                  // GOTO track 5
+  ATM_SET_TRA(2),               // FX: SET TRANSPOSITION: notes = 2
+  ATM_GOTO(5),                  // GOTO track 5
+  ATM_TRA_OFF,                  // FX: TRANSPOSITION OFF
+  ATM_RETURN,                   // RETURN
 
   //"Track 5"
-  0x00 + 5,                     // NOTE ON: note = 5
-  0x9F + 64,                    // DELAY: ticks = 64
-  0xFE,                         // RETURN
+  ATM_NOTE_E2,                  // NOTE ON: note = E2
+  ATM_DELAY(64),                // DELAY: ticks = 64
+  ATM_RETURN,                   // RETURN
 };
 
 

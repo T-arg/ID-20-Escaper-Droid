@@ -62,7 +62,7 @@
 //  ||||||└-->  /. NORTH = 0B00000000; EAST = 0B00000001; SOUTH = 0B00000010; WEST : 0B00000011
 //  |||||└--->  \ 
 //  ||||└---->   |
-//  |||└----->   | these 6 bits are used to set in which room the next level door is
+//  |||└----->   | these 6 bits are used to set in which room the next level door is leading to the exit room
 //  ||└------>   |
 //  |└------->   |
 //  └-------->  / 
@@ -71,7 +71,7 @@
 //0b00000001,
 //  |||||||└--->  \ 
 //  ||||||└---->   |
-//  |||||└----->   | these 6 bits are used to set in which room the next level TILE is
+//  |||||└----->   | these 6 bits are used to set in which room the next level TILE is leading to the next level
 //  ||||└------>   |
 //  |||└------->   |
 //  ||└-------->  / 
@@ -278,10 +278,29 @@ const unsigned char PROGMEM level04[] =
   5, 0b00011110,
 };
 
+const unsigned char PROGMEM level05[] =
+{
+  3,          // amount of rooms
+  0,          // amount of transporters
+  0,          // amount of rooms with influenceable objects
+
+  0b00001000,  // NEXT LEVEL DOOR
+  0b00000010,  // NEXT LEVEL ROOM
+
+  0b10011000, 0b00000110, 0b00000000, 0b00000000, 0b00001001, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, // room0
+  0b01100010, 0b00000000, 0b00001011, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b01000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, // room1
+  0b10100000, 0b00000000, 0b00000011, 0b00000000, 0b00000101, 0b00000000, 0b00000000, 0b00000000, 0b01100111, 0b00000000, 0b00000000, 0b00000000, 0b00000000, // room2
+
+  // transporters
+
+  // influence
+};
+
+
 // pointer table in flash too — 2 bytes per level, no SRAM copy
 const unsigned char * const PROGMEM levels[] =
 {
-  level00, level01, level02, level03, level04
+  level05, level00, level01, level02, level03, level04
 };
 
 #define AMOUNT_OF_LEVELS  (sizeof(levels) / sizeof(levels[0]))

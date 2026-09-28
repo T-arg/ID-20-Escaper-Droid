@@ -62,4 +62,21 @@ const unsigned char * const PROGMEM soundFX[] =
   sfxDoorClosed, pickUp, menuClick, shootBullet, speedUp, normalSpeed, 
 };
 
+const uint8_t intro[] PROGMEM = {
+  ATM_SET_TEMPO(30),
+  ATM_VOL(63),
+  ATM_SL_VOL(-8),
+  ATM_DELAY(16),
+  ATM_NOTE_D6,
+  ATM_DELAY(16),
+  ATM_NOTE_D6,
+  ATM_DELAY(8),
+  ATM_NOTE_D6,
+  ATM_DELAY(8),
+  ATM_NOTE_A5,
+  ATM_DELAY(32),
+  ATM_CUE(1),
+  ATM_STOP_CHAN,
+};
+
 #endif

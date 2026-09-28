@@ -1,6 +1,6 @@
 /*
   Escaper Droid
-  Arduboy version 0.8.25
+  Arduboy version 0.8.27
   
   STARTED by TEAM a.r.g.
   2016 - JO3RI - STG
@@ -51,8 +51,7 @@ void setup()
   arduboy.boot();
   arduboy.audio.begin();
   arduboy.setFrameRate(45);
-  if (!arduboy.audio.enabled()) soundMode = 3;
-  else ATM.play(introMusic);
+  ATM.playSfx(intro, 1);
   if ((EEPROM.read(OFFSET_ESCD_START) == GAME_ID) && (EEPROM.read(OFFSET_ESCD_END) == GAME_ID))
   {
     buttonSchemeOffset = EEPROM.read(OFFSET_BUTTONS);

@@ -51,7 +51,14 @@ void checkInputs()
 
   if (arduboy.justPressed(B_BUTTON))
     {
-    if (currentRoom == exitRoomLocation && player.isOnTile == TILE_IN_MIDDLE)
+    bool onExitDecal = false;
+    for (byte f = FLOOR_ONE; f <= FLOOR_FIVE; f++)
+    {
+      if (floorKind(f) == FLOOR_LEVEL_UP
+          && ((elements[f].characteristics >> 3) == player.isOnTile))
+        onExitDecal = true;
+    }
+    if ((currentRoom == exitRoomLocation && player.isOnTile == TILE_IN_MIDDLE) || onExitDecal)
     {
       gameState = STATE_GAME_NEXT_LEVEL;
       return;

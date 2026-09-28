@@ -77,12 +77,21 @@ boolean checkborderHit(int objectX, int objectY, byte directionFacing)
   return true;
 }
 
+byte floorKind(byte floorSlot)
+{
+  return elements[floorSlot].characteristics & 0b00000111;
+}
+
 byte tileIsOccupied(byte tileTesting, bool playerOrEnemy, bool enemyTwo)
 {
   if (tileTesting < 25)
   {
     currentlyOnTestingTile = itemsOrder[tileTesting + ITEMS_ORDER_TILES_START];
     if (currentlyOnTestingTile == EMPTY_PLACE) return false;
+    // LEVEL UP is only a floor decal — the droid must be able to stand on it
+    if (currentlyOnTestingTile >= FLOOR_ONE && currentlyOnTestingTile <= FLOOR_FIVE
+        && floorKind(currentlyOnTestingTile) == FLOOR_LEVEL_UP)
+      return false;
     if (playerOrEnemy)
     {
       if (currentlyOnTestingTile == PLAYER_DROID) return false;
@@ -182,11 +191,6 @@ void checkObjectTypeAndAct()
       scorePlayer += SCORE_CHIP;
       break;
   }
-}
-
-byte floorKind(byte floorSlot)
-{
-  return elements[floorSlot].characteristics & 0b00000111;
 }
 
 boolean tryPushBox(byte slot, byte dir)

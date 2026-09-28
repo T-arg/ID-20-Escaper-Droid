@@ -136,7 +136,7 @@ byte roomByte(byte roomNumber, byte offset)
 void buildRooms()
 {
   // let's read out in witch room the exit to the next level is
-  exitRoomLocation = lvByte(LEVEL_ROOM_DATA_START_AT_BYTE);
+  exitRoomLocation = lvByte(LEVEL_ROOM_DATA_START_AT_BYTE) & 0b00111111;
 
   byte amountOfRooms = lvByte(AMOUNT_OF_ROOMS_AT_BYTE);
   int transportDataAtByte = ROOMS_DATA_START_AT_BYTE + (BYTES_USED_FOR_EVERY_ROOM * amountOfRooms);

@@ -34,6 +34,7 @@
 #define FLOOR_SPIKE               2
 #define FLOOR_PIRAMIDE            3
 #define FLOOR_PIT                 4
+#define FLOOR_LEVEL_UP            7   // exit tile; walkable decal, frames 5-7 of floorTile
 
 #define SCORE_BLACK_CARD          100
 #define SCORE_WHITE_CARD          10
@@ -74,7 +75,11 @@ void drawObject()
 void drawFloor(byte floor)
 {
   if (elements[floor].characteristics > 0b00000000)
-  sprites.drawPlusMask(elements[floor].x - 3, elements[floor].y + currentRoomY + 9, floorTile_plus_mask, (elements[floor].characteristics & 0b00000111));
+  {
+    byte fr = elements[floor].characteristics & 0b00000111;
+    if (fr == FLOOR_LEVEL_UP) fr = 5 + ((arduboy.frameCount >> 3) % 3);
+    sprites.drawPlusMask(elements[floor].x - 3, elements[floor].y + currentRoomY + 9, floorTile_plus_mask, fr);
+  }
 }
 
 void drawBulletEnemy()
