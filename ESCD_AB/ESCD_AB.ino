@@ -51,7 +51,7 @@ void setup()
   arduboy.boot();
   arduboy.audio.begin();
   arduboy.setFrameRate(45);
-  ATM.playSfx(intro, 1);
+  ATM.playSfx(intro, 0);
   if ((EEPROM.read(OFFSET_ESCD_START) == GAME_ID) && (EEPROM.read(OFFSET_ESCD_END) == GAME_ID))
   {
     buttonSchemeOffset = EEPROM.read(OFFSET_BUTTONS);
