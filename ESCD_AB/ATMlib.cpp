@@ -195,6 +195,13 @@ void ATMsynth::unMuteChannel(byte ch) {
   ChannelActiveMute &= (uint8_t)(~(1 << ch));
 }
 
+void ATMsynth::setTempo(byte t)
+{
+  if (t == 0) t = 1;          // cia = 15625/t, never divide by 0
+  tickRate = t;
+  cia = 15625 / tickRate;
+}
+
 void ATMsynth::playSfx(const byte *track, byte ch) {
   if (ch > 3) return;
 

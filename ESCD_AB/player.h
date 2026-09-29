@@ -99,8 +99,7 @@ void spawnPlayerShot()
 
 void songSpeedChange()
 {
-  if (player.life>1) play_SFX(SFX_SPEEDNORMAL);
-  else play_SFX(SFX_SPEEDUP);
+  ATM.setTempo(player.life > 1 ? TEMPO_NORMAL : TEMPO_FAST);
 }
 
 void walkThroughDoor()
@@ -125,6 +124,7 @@ void playerLosesLife()
   if (!bitRead(player.characteristics, DROID_IMMUNE_AT_BIT_3))
   {
     player.life--;
+    play_SFX(SFX_YOUHURTME);
     bitSet(player.characteristics, DROID_IMMUNE_AT_BIT_3);
     songSpeedChange();
     if (player.life < 1)

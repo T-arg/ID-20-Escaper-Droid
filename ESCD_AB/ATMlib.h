@@ -61,6 +61,8 @@ class ATMsynth {
 
     // Play a raw ATM_SFX_TRACK on one channel (music on other channels keeps going)
     void playSfx(const byte *track, byte ch);
+    // Set the tempo
+    void setTempo(byte t);
 
     // Last ATM_CUE byte from the song/SFX (0 = none since last read)
     uint8_t check();

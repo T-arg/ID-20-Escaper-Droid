@@ -4,14 +4,16 @@
 // 0: music + SFX   1: music only   2: SFX only   3: mute
 byte soundMode = 0;
 
+#define TEMPO_NORMAL          36
+#define TEMPO_FAST            40
+
 #define SFX_DOOR              0
 #define SFX_PICKUP            1
 #define SFX_MENU              2
 #define SFX_SHOOT             3
-#define SFX_SPEEDUP           4
-#define SFX_SPEEDNORMAL       5
-#define SFX_LEVELUP           6
-#define SFX_BEAMMEUPSCOTTY    7
+#define SFX_LEVELUP           4
+#define SFX_BEAMMEUPSCOTTY    5
+#define SFX_YOUHURTME         6
 
 const uint8_t sfxDoorClosed[] PROGMEM = {
   ATM_VOL(63),
@@ -49,15 +51,6 @@ const uint8_t shootBullet[] PROGMEM = {
   ATM_STOP_CHAN,
 };
 
-const uint8_t speedUp[] PROGMEM = {
-  ATM_SET_TEMPO(40),
-  ATM_STOP_CHAN,
-};
-
-const uint8_t normalSpeed[] PROGMEM = {
-  ATM_SET_TEMPO(36),
-  ATM_STOP_CHAN,
-};
 
 const uint8_t levelUp[] PROGMEM = {
   ATM_VOL(16),
@@ -82,9 +75,21 @@ const uint8_t beamMeUpScotty[] PROGMEM = {
   ATM_STOP_CHAN,
 };
 
+const uint8_t youHurtMe[] PROGMEM = {
+  ATM_VOL(63),
+  ATM_VIB(8,0B10000011),
+  ATM_ARP(0B01010011,0B00100001),
+  ATM_NOTE_G3,
+  ATM_DELAY(16),
+  ATM_GLIS(0B10000001),
+  ATM_SL_VOL(-2),
+  ATM_DELAY(16),
+  ATM_STOP_CHAN,
+};
+
 const unsigned char * const PROGMEM soundFX[] =
 {
-  sfxDoorClosed, pickUp, menuClick, shootBullet, speedUp, normalSpeed, levelUp, beamMeUpScotty,
+  sfxDoorClosed, pickUp, menuClick, shootBullet, levelUp, beamMeUpScotty, youHurtMe,
 };
 
 const uint8_t intro[] PROGMEM = {

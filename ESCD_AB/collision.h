@@ -163,7 +163,6 @@ void checkObjectTypeAndAct()
       break;
     case PICKUP_BATTERY:
       play_SFX(SFX_PICKUP);
-      songSpeedChange();
       if (player.life < 3)
       {
         player.life++;
@@ -175,6 +174,7 @@ void checkObjectTypeAndAct()
         clearElement();
         scorePlayer += SCORE_TO_MUCH_LIFE;
       }
+      songSpeedChange();
       break;
     case PICKUP_BULLET:
       play_SFX(SFX_PICKUP);
