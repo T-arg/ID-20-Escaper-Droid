@@ -156,12 +156,14 @@ void stateMenuSdfx()
   {
     menuSelection++;
     checkSoundState(menuSelection);
+    playMenuMusic();
     play_SFX(SFX_MENU);
   }
   if (arduboy.justPressed(LEFT_BUTTON) && (menuSelection > 0))
   {
     menuSelection--;
     checkSoundState(menuSelection);
+    playMenuMusic();
     play_SFX(SFX_MENU);
   }
   if (arduboy.justPressed(A_BUTTON | B_BUTTON))

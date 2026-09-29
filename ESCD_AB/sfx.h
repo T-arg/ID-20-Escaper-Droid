@@ -14,6 +14,9 @@ byte soundMode = 0;
 #define SFX_LEVELUP           4
 #define SFX_BEAMMEUPSCOTTY    5
 #define SFX_YOUHURTME         6
+#define SFX_SWITCH            7
+#define SFX_KILL              8
+#define SFX_PIRAMIDE          9
 
 const uint8_t sfxDoorClosed[] PROGMEM = {
   ATM_VOL(63),
@@ -71,7 +74,7 @@ const uint8_t beamMeUpScotty[] PROGMEM = {
   ATM_SL_VOL(1),
   ATM_VIB(32,0B10000111),
   ATM_NOTE_C7,
-  ATM_DELAY(64),
+  ATM_DELAY(48),
   ATM_STOP_CHAN,
 };
 
@@ -87,9 +90,39 @@ const uint8_t youHurtMe[] PROGMEM = {
   ATM_STOP_CHAN,
 };
 
+const uint8_t useSwitch[] PROGMEM = {
+  ATM_VOL(63),
+  ATM_NOTE_F2,
+  ATM_ARP(0B11001100,0B00000100),
+  ATM_DELAY(14),
+  ATM_SL_VOL(-8),
+  ATM_DELAY(4),
+  ATM_STOP_CHAN,
+};
+
+const uint8_t killTheEnemy[] PROGMEM = {
+  ATM_VOL(63),
+  ATM_VIB(24,0B10000001),
+  ATM_NOTE_C4,
+  ATM_DELAY(12),
+  ATM_SL_VOL(-16),
+  ATM_DELAY(6),
+  ATM_STOP_CHAN,
+};
+
+const uint8_t clearThePiramide[] PROGMEM = {
+  ATM_VOL(63),
+  ATM_NOTE_E2,
+  ATM_DELAY(8),
+  ATM_SL_VOL(-16),
+  ATM_GLIS(0B00000001),
+  ATM_DELAY(4),
+  ATM_STOP_CHAN,
+};
+
 const unsigned char * const PROGMEM soundFX[] =
 {
-  sfxDoorClosed, pickUp, menuClick, shootBullet, levelUp, beamMeUpScotty, youHurtMe,
+  sfxDoorClosed, pickUp, menuClick, shootBullet, levelUp, beamMeUpScotty, youHurtMe, useSwitch, killTheEnemy, clearThePiramide
 };
 
 const uint8_t intro[] PROGMEM = {
@@ -107,6 +140,14 @@ const uint8_t intro[] PROGMEM = {
   ATM_NOTE_A5,
   ATM_DELAY(32),
   ATM_CUE(1),
+  ATM_STOP_CHAN,
+};
+
+const uint8_t openTheDoor[] PROGMEM = {
+  ATM_VOL(0),
+  ATM_NOISE(0B00111010),
+  ATM_SL_VOL(4),
+  ATM_DELAY(16),
   ATM_STOP_CHAN,
 };
 

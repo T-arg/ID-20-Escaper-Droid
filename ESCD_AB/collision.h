@@ -43,6 +43,7 @@ void playerChecksAndOpensDoor(byte direction)
   byte need = isLevel ? 0b00100000 : 0b00001000;
   if (player.assets & (isLevel ? 0b00100000 : 0b00011000))
   {
+    if (!(soundMode & 1)) ATM.playSfx(openTheDoor,3);
     player.assets -= need;
     scorePlayer += isLevel ? SCORE_LEVEL_DOOR : SCORE_OPEN_DOOR;
     bitClear(stageRoom[currentRoom].doorsClosedActive, direction);
@@ -257,6 +258,7 @@ void killEnemy(byte enemySlot)
   bitClear(stageRoom[currentRoom].elementsActive, 7 - enemySlot);
   elements[enemySlot].characteristics = 0;
   scorePlayer += SCORE_ENEMY_HIT;
+  play_SFX(SFX_KILL);
 }
 
 byte tileOccupant(int ox, int oy)
@@ -275,6 +277,7 @@ bool shotHitsBlockingFloor(byte occupant)
   {
     bitClear(stageRoom[currentRoom].elementsActive, 7 - occupant);
     elements[occupant].characteristics = 0;
+    play_SFX(SFX_PIRAMIDE);
     return true;
   }
   return (kind == FLOOR_BOX || kind == FLOOR_SPIKE);

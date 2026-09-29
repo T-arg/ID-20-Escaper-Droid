@@ -95,7 +95,7 @@ void checkInputs()
         byte mask       = stageRoom[currentRoom].elementsInfluenced;
         stageRoom[targetRoom].elementsActive ^= mask;
         usedAction = true;
-        play_SFX(SFX_DOOR);
+        play_SFX(SFX_SWITCH);
       }
     }
 
