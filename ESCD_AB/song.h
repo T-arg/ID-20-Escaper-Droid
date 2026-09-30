@@ -1,7 +1,7 @@
 #ifndef SONG_H
 #define SONG_H
 
-#include "atm_cmds.h"
+#include <ATMcmds.h>
 
 #define Song const uint8_t PROGMEM
 
