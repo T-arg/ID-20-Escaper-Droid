@@ -168,6 +168,27 @@
 //
 //
 
+const unsigned char PROGMEM level00[] =
+{
+  3,          // amount of rooms
+  0,          // amount of transporters
+  0,          // amount of rooms with influenceable objects
+
+  0b00001011,  // NEXT LEVEL DOOR
+  0b00000010,  // NEXT LEVEL ROOM
+
+  0b00100000, 0b00000000, 0b00000111, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b11000011, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, // room0 BULLET t24
+  0b10100010, 0b00000000, 0b00001011, 0b00000000, 0b00000001, 0b10100011, 0b00000000, 0b11001000, 0b01111100, 0b00101100, 0b10010100, 0b01000100, 0b01100100, // room1 BLACK CARD t0
+  0b10000000, 0b00000000, 0b00000000, 0b00000000, 0b00000101, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, // room2
+
+  // transporters
+
+  // influence
+};
+// LAYOUT 0:40,40 1:180,40 2:320,40
+
+
+
 const unsigned char PROGMEM ESCDlevel01[] =
 {
   4,          // amount of rooms
@@ -217,6 +238,29 @@ const unsigned char PROGMEM ESCDlevel02[] =
 
 const unsigned char PROGMEM ESCDlevel03[] =
 {
+  5,          // amount of rooms
+  0,          // amount of transporters
+  1,          // amount of rooms with influenceable objects
+
+  0b00001001,  // NEXT LEVEL DOOR
+  0b00000010,  // NEXT LEVEL ROOM
+
+  0b00110010, 0b00000110, 0b00010011, 0b00000000, 0b00000000, 0b11000001, 0b00000000, 0b00000011, 0b01011100, 0b00110100, 0b00111100, 0b10101100, 0b01001100, // room0
+  0b11101000, 0b00000000, 0b00001111, 0b00000000, 0b00001001, 0b00001001, 0b00101001, 0b10100000, 0b11000100, 0b10010100, 0b01100100, 0b00110100, 0b00000100, // room1
+  0b00100000, 0b00000000, 0b00000111, 0b00000000, 0b00000000, 0b00100011, 0b11000011, 0b01110100, 0b10011011, 0b01101011, 0b01001011, 0b00010001, 0b01100111, // room2
+  0b10000000, 0b00000000, 0b00000000, 0b00000000, 0b00000101, 0b00100000, 0b11000000, 0b10100001, 0b10101011, 0b01111011, 0b01101011, 0b10011011, 0b01001011, // room3
+  0b10000000, 0b00000000, 0b00000000, 0b00000000, 0b00000001, 0b10100011, 0b00000011, 0b01010110, 0b01011011, 0b01111011, 0b00101011, 0b10000011, 0b00110011, // room4
+
+  // transporters
+
+  // influence
+  0b00000001, 0b10110100, // I0
+};
+// LAYOUT 0:320,180 1:320,40 2:180,40 3:460,40 4:460,180
+
+
+const unsigned char PROGMEM ESCDlevel04[] =
+{
   9,          // amount of rooms
   2,          // amount of transporters
   2,          // amount of rooms with influenceable objects
@@ -246,7 +290,7 @@ const unsigned char PROGMEM ESCDlevel03[] =
 // LAYOUT 0:160,160 1:300,160 2:160,20 3:20,160 4:440,160 5:160,300 6:440,440 7:440,300 8:440,580
 
 
-const unsigned char PROGMEM ESCDlevel04[] =
+const unsigned char PROGMEM ESCDlevel05[] =
 {
   9,          // amount of rooms
   1,          // amount of transporters
@@ -276,7 +320,7 @@ const unsigned char PROGMEM ESCDlevel04[] =
 // LAYOUT 0:40,40 1:180,40 2:180,180 3:320,40 4:320,180 5:40,180 6:40,320 7:180,320 8:320,320
 
 
-const unsigned char PROGMEM ESCDlevel05[] =
+const unsigned char PROGMEM ESCDlevel06[] =
 {
   5,          // amount of rooms
   0,          // amount of transporters
@@ -300,7 +344,7 @@ const unsigned char PROGMEM ESCDlevel05[] =
 // LAYOUT 0:40,40 1:180,40 2:320,40 3:460,40 4:600,40
 
 
-const unsigned char PROGMEM ESCDlevel06[] =
+const unsigned char PROGMEM ESCDlevel07[] =
 {
   8,          // amount of rooms
   1,          // amount of transporters
@@ -333,7 +377,7 @@ const unsigned char PROGMEM ESCDlevel06[] =
 // pointer table in flash too — 2 bytes per level, no SRAM copy
 const unsigned char * const PROGMEM levels[] =
 {
-  ESCDlevel01, ESCDlevel02, ESCDlevel03, ESCDlevel04, ESCDlevel05, ESCDlevel06
+  level00, ESCDlevel01, ESCDlevel02, ESCDlevel03, ESCDlevel04, ESCDlevel05, ESCDlevel06, ESCDlevel07,
 };
 
 #define AMOUNT_OF_LEVELS  (sizeof(levels) / sizeof(levels[0]))

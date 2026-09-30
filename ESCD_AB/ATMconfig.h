@@ -1,5 +1,5 @@
-#ifndef _ATM_CONFIG_H_
-#define _ATM_CONFIG_H_
+#ifndef _ATMCONFIG_H_
+#define _ATMCONFIG_H_
 
 // Waveforms are fixed at compile time. Change these, then recompile.
 // ATM_WAVE_PULSE  0

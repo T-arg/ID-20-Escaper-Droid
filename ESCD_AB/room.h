@@ -8,7 +8,7 @@
 #include "font.h"
 
 #define UPPERBIT_OFFSET               4
-#define LEVEL_OFFSET                  1         
+#define LEVEL_OFFSET                  1 
 
 #define TILE_INFRONT_DOOR_NORTH       2
 #define TILE_INFRONT_DOOR_EAST        10
@@ -135,6 +135,7 @@ byte roomByte(byte roomNumber, byte offset)
 
 void buildRooms()
 {
+  dropRoom = 0xFF;
   // let's read out in witch room the exit to the next level is
   exitRoomLocation = lvByte(LEVEL_ROOM_DATA_START_AT_BYTE) & 0b00111111;
 
@@ -212,7 +213,6 @@ int translateTileToY (byte currentTile)
   return (18 + (currentTile * 6) - ((currentTile / 5) * 24));
 }
 
-
 bool checkIfOnCenterTile (byte coX, byte coY)
 {
   // same 5×5 centres as the loop above, closed form
@@ -270,8 +270,9 @@ void enterRoom(byte roomNumber)
     {
       byte b = roomByte(roomNumber, 5 + i);
       byte currentTile = b >> 3;
-      elements[i].characteristics = b;
-      if (currentTile > 24) elements[i].characteristics = 0;
+      if (currentTile > 24) currentTile = 0;
+      //if (currentTile > 24) elements[i].characteristics = 0;
+      elements[i].characteristics = b; 
       elements[i].x = translateTileToX(currentTile);
       elements[i].y = translateTileToY(currentTile);
     }
@@ -282,6 +283,15 @@ void enterRoom(byte roomNumber)
       bitSet(elements[OBJECT].characteristics, 0);
     else
       bitClear(elements[OBJECT].characteristics, 0);
+  }
+  if (dropRoom == roomNumber)
+  {
+    byte s = dropInfo >> 5;
+    byte t = dropInfo & 31;
+    bitSet(stageRoom[roomNumber].elementsActive, 7 - s);
+    elements[s].characteristics = (t << 3) | ENEMY_BATTERY;
+    elements[s].x = translateTileToX(t);
+    elements[s].y = translateTileToY(t);
   }
 }
 
@@ -591,8 +601,8 @@ void drawHUD()
   sprites.drawSelfMasked(121, 59, hudBlackCard, 0);
 
   //draw life (battery icon + count nudged 2px up)
-  if (arduboy.everyXFrames(20) && (player.life < 2)) bitToggle(player.assets,DROID_BATTERY_VISIBLE_AT_BIT_6);
-  else if (player.life > 1) bitSet(player.assets,DROID_BATTERY_VISIBLE_AT_BIT_6);
+  if bitRead(player.characteristics,DROID_DYING_AT_BIT_4) bitSet(player.assets,DROID_BATTERY_VISIBLE_AT_BIT_6);
+  else if (arduboy.everyXFrames(20) && (player.life < 2)) bitToggle(player.assets,DROID_BATTERY_VISIBLE_AT_BIT_6);
   if (bitRead(player.assets, DROID_BATTERY_VISIBLE_AT_BIT_6)) sprites.drawSelfMasked(122, 9, hudLife, player.life);
 }
 

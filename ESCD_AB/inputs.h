@@ -145,6 +145,7 @@ void updateEnemies()
 
     byte dir = (elements[i].characteristics & 0b00011000) >> 3;
     byte type = elements[i].characteristics & 0b00000111;
+    if (type > ENEMY_SHOOTER) continue;
 
     if (enemyCanMove(i, dir))
     {

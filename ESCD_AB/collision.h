@@ -43,7 +43,6 @@ void playerChecksAndOpensDoor(byte direction)
   byte need = isLevel ? 0b00100000 : 0b00001000;
   if (player.assets & (isLevel ? 0b00100000 : 0b00011000))
   {
-    if (!(soundMode & 1)) ATM.playSfx(openTheDoor,3);
     player.assets -= need;
     scorePlayer += isLevel ? SCORE_LEVEL_DOOR : SCORE_OPEN_DOOR;
     bitClear(stageRoom[currentRoom].doorsClosedActive, direction);
@@ -135,6 +134,14 @@ boolean hitObjects (int objectX, int objectY, int directionFacing, bool playerOr
   else return false;
 }
 
+void collectBattery()
+{
+  play_SFX(SFX_PICKUP);
+  songSpeedChange();
+  if (player.life < 3) { player.life++; scorePlayer += SCORE_LIFE; }
+  else scorePlayer += SCORE_TO_MUCH_LIFE;
+}
+
 void clearElement()
 {
   bitClear(stageRoom[currentRoom].elementsActive, 5);
@@ -163,19 +170,8 @@ void checkObjectTypeAndAct()
       }
       break;
     case PICKUP_BATTERY:
-      play_SFX(SFX_PICKUP);
-      if (player.life < 3)
-      {
-        player.life++;
-        clearElement();
-        scorePlayer += SCORE_LIFE;
-      }
-      else
-      {
-        clearElement();
-        scorePlayer += SCORE_TO_MUCH_LIFE;
-      }
-      songSpeedChange();
+      collectBattery();
+      clearElement();
       break;
     case PICKUP_BULLET:
       play_SFX(SFX_PICKUP);
@@ -229,7 +225,15 @@ void decideOnCollision()
   {
     case ENEMY_ONE:
     case ENEMY_TWO:
-      playerLosesLife();
+      if ((elements[currentlyOnTestingTile].characteristics & 7) == ENEMY_BATTERY)
+      {
+        collectBattery();
+        bitClear(stageRoom[currentRoom].elementsActive, 7 - currentlyOnTestingTile);
+        elements[currentlyOnTestingTile].characteristics = 0;
+        dropRoom = 0xFF;
+      }
+      else
+        playerLosesLife();
       break;
     case OBJECT:
       checkObjectTypeAndAct();
@@ -255,10 +259,17 @@ void decideOnCollision()
 
 void killEnemy(byte enemySlot)
 {
+  scorePlayer += SCORE_ENEMY_HIT;
+  if ((elements[enemySlot].characteristics & 7) == ENEMY_SHOOTER)
+  {
+    byte tile = tileFromXY(elements[enemySlot].x, elements[enemySlot].y);
+    elements[enemySlot].characteristics = (tile << 3) | ENEMY_BATTERY;
+    dropRoom = currentRoom;
+    dropInfo = tile | (enemySlot << 5);
+    return;
+  }
   bitClear(stageRoom[currentRoom].elementsActive, 7 - enemySlot);
   elements[enemySlot].characteristics = 0;
-  scorePlayer += SCORE_ENEMY_HIT;
-  play_SFX(SFX_KILL);
 }
 
 byte tileOccupant(int ox, int oy)
@@ -277,7 +288,6 @@ bool shotHitsBlockingFloor(byte occupant)
   {
     bitClear(stageRoom[currentRoom].elementsActive, 7 - occupant);
     elements[occupant].characteristics = 0;
-    play_SFX(SFX_PIRAMIDE);
     return true;
   }
   return (kind == FLOOR_BOX || kind == FLOOR_SPIKE);
@@ -292,6 +302,7 @@ byte shotHitsEnemyAt(int sx, int sy)
   for (byte i = 0; i < 2; i++)
   {
     if (!bitRead(stageRoom[currentRoom].elementsActive, 7 - i)) continue;
+    if ((elements[i].characteristics & 7) == ENEMY_BATTERY) continue;
     if (tileFromXY(elements[i].x, elements[i].y) == shotTile) return i;
   }
   return 255;

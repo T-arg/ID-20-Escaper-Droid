@@ -19,6 +19,7 @@
 #define ENEMY_FLYER               1   // enemies_plus_mask frames 4-7  (N,E,S,W)
 #define ENEMY_MOVER               2   // enemies_plus_mask frames 8-11 (N,E,S,W)
 #define ENEMY_SHOOTER             3   // enemies_plus_mask frames 12-15(N,E,S,W)
+#define ENEMY_BATTERY             4   // dead shooter; object battery frames
 
 #define PICKUP_BLACK_CARD         0
 #define PICKUP_WHITE_CARD         1
@@ -56,13 +57,23 @@ struct Element
 Element elements[9];
 bool enemyBulletActive = false;
 
+byte dropRoom = 0xFF;   // 0xFF = no unpicked shooter battery
+byte dropInfo;          // bits 0-4 tile, bit 5 slot
+
 void drawShot(int sx, int sy);
 
 void drawEnemies(bool i)
 {
   byte ch = elements[i].characteristics;
-  sprites.drawPlusMask(elements[i].x, elements[i].y + currentRoomY, enemies_plus_mask,
-                       ((ch & 0b00000111) << 2) | ((ch & 0b00011000) >> 3));
+  if ((ch & 7) == ENEMY_BATTERY)
+  {
+    if (arduboy.everyXFrames(8) && ++elements[i].frame > 5) elements[i].frame = 0;
+    sprites.drawPlusMask(elements[i].x + 4, elements[i].y + currentRoomY + 6, elements_plus_mask,
+                         12 + elements[i].frame);
+  }
+  else
+    sprites.drawPlusMask(elements[i].x, elements[i].y + currentRoomY, enemies_plus_mask,
+                         ((ch & 7) << 2) | ((ch & 0b00011000) >> 3));
 }
 
 void drawObject()
