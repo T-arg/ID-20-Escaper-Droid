@@ -107,6 +107,8 @@ byte tileIsOccupied(byte tileTesting, bool playerOrEnemy, bool enemyTwo)
   else return false;
 }
 
+bool kickPlayer(byte dir);
+
 boolean hitObjects (int objectX, int objectY, int directionFacing, bool playerOrEnemy, bool enemy)
 {
   directionFacing &= 3;
@@ -128,7 +130,13 @@ boolean hitObjects (int objectX, int objectY, int directionFacing, bool playerOr
   byte test = tileIsOccupied(testingTile, playerOrEnemy, enemy);
   if (test > 0)
   {
-    if (test == PLAYER_DROID) playerLosesLife();
+    if (test == PLAYER_DROID)
+    {
+      // enemy is the slot (0/1). A successful shove frees the tile so the boxer can step.
+      if ((elements[enemy].characteristics & 7) == ENEMY_BOX)
+        return !kickPlayer(directionFacing);
+      playerLosesLife();
+    }
     return true;
   }
   else return false;
@@ -190,32 +198,55 @@ void checkObjectTypeAndAct()
   }
 }
 
-boolean tryPushBox(byte slot, byte dir)
-{
-  if (floorKind(slot) != FLOOR_BOX) return false;
-  dir &= 3;
-  if (!checkIfOnCenterTile(elements[slot].x, elements[slot].y)) return false;
+// N,E,S,W tile step. Shared by box push, B-action neighbor, boxer kick.
+PROGMEM const int8_t dirTileOffset[] = { -5, -1, 5, 1 };
 
-  byte src = tileFromXY(elements[slot].x, elements[slot].y);
-  if (src >= 25) return false;
+int8_t tileInDir(byte src, byte dir)
+{
+  dir &= 3;
+  if (src >= 25) return -1;
   byte col = src % 5;
   if ((dir == NORTH && src < 5) ||
       (dir == SOUTH && src >= 20) ||
       (dir == EAST  && col == 0) ||
       (dir == WEST  && col == 4))
-    return false;
+    return -1;
+  return (int8_t)src + (int8_t)pgm_read_byte(&dirTileOffset[dir]);
+}
 
-  int8_t dest = (int8_t)src;
-  if (dir == NORTH) dest -= 5;
-  else if (dir == EAST) dest -= 1;
-  else if (dir == SOUTH) dest += 5;
-  else dest += 1;
-  if (dest < 0 || dest > 24) return false;
+boolean tryPushBox(byte slot, byte dir)
+{
+  if (floorKind(slot) != FLOOR_BOX) return false;
+  if (!checkIfOnCenterTile(elements[slot].x, elements[slot].y)) return false;
+  int8_t dest = tileInDir(tileFromXY(elements[slot].x, elements[slot].y), dir);
+  if (dest < 0) return false;
   if (itemsOrder[dest + ITEMS_ORDER_TILES_START] != EMPTY_PLACE) return false;
-
-  // kick: snap one full tile
   elements[slot].x = translateTileToX(dest);
   elements[slot].y = translateTileToY(dest);
+  return true;
+}
+
+// Boxer shove: one tile along facing. Hurt only on spikes or another enemy.
+bool kickPlayer(byte dir)
+{
+  int8_t dest = tileInDir(player.isOnTile, dir);
+  if (dest < 0) return false;
+  byte occ = itemsOrder[dest + ITEMS_ORDER_TILES_START];
+  bool foe = (occ <= ENEMY_TWO);
+  bool spike = false;
+  if (occ >= FLOOR_ONE && occ <= FLOOR_FIVE)
+  {
+    byte kind = floorKind(occ);
+    if (kind == FLOOR_SPIKE) spike = true;
+    else if (kind != FLOOR_LEVEL_UP && kind != FLOOR_PIT) return false;
+  }
+  else if (occ != EMPTY_PLACE && !foe) return false;
+
+  player.isOnTile = dest;
+  currentRoomY = setCurrentRoomY(dest);
+  player.x = translateTileToX(dest);
+  player.y = translateTileToY(dest) + currentRoomY;
+  if (foe || spike) playerLosesLife();
   return true;
 }
 
@@ -231,6 +262,12 @@ void decideOnCollision()
         bitClear(stageRoom[currentRoom].elementsActive, 7 - currentlyOnTestingTile);
         elements[currentlyOnTestingTile].characteristics = 0;
         dropRoom = 0xFF;
+      }
+      else if ((elements[currentlyOnTestingTile].characteristics & 7) == ENEMY_BOX)
+      {
+        byte dir = (elements[currentlyOnTestingTile].characteristics >> 3) & 3;
+        byte et = tileFromXY(elements[currentlyOnTestingTile].x, elements[currentlyOnTestingTile].y);
+        if (tileInDir(et, dir) == player.isOnTile) kickPlayer(dir);
       }
       else
         playerLosesLife();

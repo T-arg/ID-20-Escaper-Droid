@@ -13,8 +13,6 @@ PROGMEM const unsigned char buttonScheme[] = {
   LEFT_BUTTON, UP_BUTTON, RIGHT_BUTTON, DOWN_BUTTON
 };
 
-PROGMEM const int8_t dirTileOffset[] = { -5, -1, 5, 1 };
-
 void checkInputs()
 {
   if (arduboy.everyXFrames(2))
