@@ -600,8 +600,8 @@ void drawHUD()
   drawNumbers(123, 53,((bitRead(player.assets,DROID_HAS_BLACK_CARD_AT_BIT_5)) == 0) ? 0 : 1, 1);
   sprites.drawSelfMasked(121, 59, hudBlackCard, 0);
 
-  //draw life (battery icon + count nudged 2px up)
-  if bitRead(player.characteristics,DROID_DYING_AT_BIT_4) bitSet(player.assets,DROID_BATTERY_VISIBLE_AT_BIT_6);
+  //draw life (battery icon + count)
+  if (bitRead(player.characteristics,DROID_DYING_AT_BIT_4) || (player.life > 1))bitSet(player.assets,DROID_BATTERY_VISIBLE_AT_BIT_6);
   else if (arduboy.everyXFrames(20) && (player.life < 2)) bitToggle(player.assets,DROID_BATTERY_VISIBLE_AT_BIT_6);
   if (bitRead(player.assets, DROID_BATTERY_VISIBLE_AT_BIT_6)) sprites.drawSelfMasked(122, 9, hudLife, player.life);
 }
