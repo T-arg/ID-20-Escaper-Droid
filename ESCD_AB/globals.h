@@ -121,7 +121,8 @@ void play_SFX(byte idSfx)
 
 void playMenuMusic()
 {
-  ATM.play(menuSong);
+  ATM.play(titleSong);
+  //ATM.play(menuSong);
   ATM.setTempo(TEMPO_NORMAL);
   if (soundMode >= 2) ATM.pause();   // SFX only: keep ISR, freeze score
 }
