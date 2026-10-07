@@ -129,7 +129,7 @@ void playerLosesLife()
     songSpeedChange();
     if (player.life < 1)
     {
-      ATM.play(youDied);
+      ATM.play(gameOver);
       if (soundMode >= 2) ATM.pause();   // SFX only: keep ISR, freeze score
       bitSet(player.characteristics, DROID_DYING_AT_BIT_4);
       bitClear(player.characteristics, DROID_IMMUNE_AT_BIT_3);

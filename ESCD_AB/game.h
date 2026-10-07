@@ -5,6 +5,12 @@
 #include "inputs.h"
 #include "text.h"
 
+void playGameMusic()
+{
+  ATM.play(gameSong);
+  ATM.setTempo(TEMPO_NORMAL);
+  if (soundMode >= 2) ATM.pause();   // SFX only: keep ISR, freeze score
+}
 
 void stateGameNew()
 {
@@ -16,7 +22,7 @@ void stateGameNew()
   EEPROM.write(OFFSET_BUTTONS,buttonSchemeOffset);
   EEPROM.write(OFFSET_ESCD_END,GAME_ID);
   gameState = STATE_GAME_NEXT_LEVEL;
-  
+  playGameMusic();
 }
 
 void stateGameContinue()
@@ -24,6 +30,7 @@ void stateGameContinue()
   scorePlayer = 0;
   player.set();
   gameState = STATE_GAME_NEXT_LEVEL;
+  playGameMusic();
 }
 
 void stateMenuPlay()

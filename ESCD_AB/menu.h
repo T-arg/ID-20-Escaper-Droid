@@ -26,7 +26,6 @@ void checkSoundState(byte mode)
     return;
   }
   arduboy.audio.on();
-  //ATM.play(menuSong);
   ATM.play(titleSong);
   if (mode >= 2) ATM.pause();   // SFX only: keep ISR, freeze score
 }
