@@ -555,7 +555,7 @@ void checkOrderOfObjects()
   }
 }
 
-void drawNumbers(byte x, byte y, unsigned long numbers, byte width)
+void drawNumbers(byte x, byte y, byte numbers, byte width)
 {
   // HUD digits use the same 3-column ticker font as the scrolling text
   byte digits[7];

@@ -65,13 +65,13 @@
 #define ATM_FX_ARP 1          // ATM_ARP / ATM_ARP_OFF
 #endif
 #ifndef ATM_FX_NOISE
-#define ATM_FX_NOISE 1        // ATM_NOISE / ATM_NOISE_OFF (retrigger)
+#define ATM_FX_NOISE 0        // ATM_NOISE / ATM_NOISE_OFF (retrigger) - not used by any song or sfx
 #endif
 #ifndef ATM_FX_TRANSPOSE
 #define ATM_FX_TRANSPOSE 1    // ATM_ADD_TRA / ATM_SET_TRA / ATM_TRA_OFF
 #endif
 #ifndef ATM_FX_TREMOLO
-#define ATM_FX_TREMOLO 1      // ATM_TREM / ATM_TREM_OFF
+#define ATM_FX_TREMOLO 0      // ATM_TREM / ATM_TREM_OFF - not used by any song or sfx
 #endif
 #ifndef ATM_FX_VIBRATO
 #define ATM_FX_VIBRATO 1      // ATM_VIB / ATM_VIB_OFF
@@ -89,7 +89,7 @@
 #define ATM_FX_TEMPO 1        // ATM_ADD_TEMPO / ATM_SET_TEMPO in the score
 #endif
 #ifndef ATM_FX_GOTO_ADV
-#define ATM_FX_GOTO_ADV 1     // ATM_GOTO_ADV
+#define ATM_FX_GOTO_ADV 0     // ATM_GOTO_ADV - not used by any song or sfx
 #endif
 #ifndef ATM_FX_STOP
 #define ATM_FX_STOP 1         // ATM_STOP_CHAN

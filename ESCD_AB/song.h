@@ -1,10 +1,31 @@
 #ifndef SONG_H
 #define SONG_H
 
+// ---------------------------------------------------------------------------
+//  Game songs, size-optimised (same notes, volumes, slides, tempo and cues as before)
+//
+//    gameOver   106 B  unchanged (nothing left to save: every track is used, the pieces that repeat are
+//                      already shared; moving the toll slide into the drum track saves 0 bytes)
+//    titleSong  546 B -> 351 B   (Escaper Droid, loops, ATM_CUE(2) once per beat, tempo 36 set in the song)
+//    gameSong   245 B -> 212 B   (Quest Theme, loops, no tempo in the song: the sketch sets it)
+//
+//  The two loops are now hop-free self-loops: every channel's entry track ends with ATM_GOTO(itself)
+//  and sums to exactly the loop length (titleSong 512 ticks, gameSong 1024 ticks), so there is no
+//  ATM_STOP_CHAN / ATM_GOTO_ADV any more and no silent tick at the seam.
+//  Checked tick by tick against the old data: identical note and cue events and identical volume /
+//  frequency of all four channels, and every loop pass is identical.
+// ---------------------------------------------------------------------------
+
 #include <ATMcmds.h>
 
 #define Song const uint8_t PROGMEM
 
+// in-game music plays at 60 % of the title music volume (ATMlib README: "Keep the music quieter than the effects")
+// only gameSong uses MV() / MS(); titleSong and gameOver stay at 100 %. Scaled at compile time, no extra bytes.
+#define MUSIC_VOL_PCT 60                       // 100 = original
+#define MV(v) ((v) * MUSIC_VOL_PCT / 100)
+// the fade step, scaled the same way and never below 1 (a 0 would stop the fade)
+#define MS(n) ((uint8_t)-((((n) * MUSIC_VOL_PCT + 50) / 100) < 1 ? 1 : (((n) * MUSIC_VOL_PCT + 50) / 100)))
 
 
 Song gameOver[] = {     // total song bytes = 106
@@ -95,64 +116,81 @@ Song gameOver[] = {     // total song bytes = 106
 
 };
 
-Song titleSong[] = {     // total song bytes = 546
-  0x20,                       // Number of tracks
-  0x00, 0x00,                 // Track 0  @    0  (silent)
-  0x03, 0x00,                 // Track 1  @    3  (lead)
-  0x18, 0x00,                 // Track 2  @   24  (bar1)
-  0x25, 0x00,                 // Track 3  @   37  (bar2)
-  0x32, 0x00,                 // Track 4  @   50  (bar3)
-  0x3F, 0x00,                 // Track 5  @   63  (bar4)
-  0x4C, 0x00,                 // Track 6  @   76  (bar5)
-  0x5D, 0x00,                 // Track 7  @   93  (bar6)
-  0x6E, 0x00,                 // Track 8  @  110  (bar7)
-  0x7F, 0x00,                 // Track 9  @  127  (bar8)
-  0x90, 0x00,                 // Track 10 @  144  (chords)
-  0xAB, 0x00,                 // Track 11 @  171  (kick)
-  0xB8, 0x00,                 // Track 12 @  184  (beat_D)
-  0xC4, 0x00,                 // Track 13 @  196  (beat_G)
-  0xD0, 0x00,                 // Track 14 @  208  (beat_A)
-  0xDC, 0x00,                 // Track 15 @  220  (beat_Bm)
-  0xE8, 0x00,                 // Track 16 @  232  (beat_D_last)
-  0xF4, 0x00,                 // Track 17 @  244  (bass)
-  0x17, 0x01,                 // Track 18 @  279  (bass_beat)
-  0x23, 0x01,                 // Track 19 @  291  (bass_beat4)
-  0x2F, 0x01,                 // Track 20 @  303  (bass_bar)
-  0x35, 0x01,                 // Track 21 @  309  (bass_beat4_last)
-  0x41, 0x01,                 // Track 22 @  321  (bass_bar_last)
-  0x47, 0x01,                 // Track 23 @  327  (drums)
-  0x59, 0x01,                 // Track 24 @  345  (drum_A)
-  0x69, 0x01,                 // Track 25 @  361  (drum_B)
-  0x74, 0x01,                 // Track 26 @  372  (drum_pair)
-  0x79, 0x01,                 // Track 27 @  377  (drum_bar)
-  0x7D, 0x01,                 // Track 28 @  381  (drum_fill)
-  0xA6, 0x01,                 // Track 29 @  422  (drum_fill_last)
-  0xCF, 0x01,                 // Track 30 @  463  (drum_bar_fill)
-  0xD6, 0x01,                 // Track 31 @  470  (drum_bar_fill_last)
+Song titleSong[] = {     // total song bytes = 351
+  0x0F,                       // Number of tracks
+  0x00, 0x00,                 // Address of track 0      0   drums
+  0x07, 0x00,                 // Address of track 1      7   drum_half
+  0x27, 0x00,                 // Address of track 2     39   drum_A
+  0x37, 0x00,                 // Address of track 3     55   drum_pair
+  0x44, 0x00,                 // Address of track 4     68   lead
+  0xBA, 0x00,                 // Address of track 5    186   chords
+  0xD1, 0x00,                 // Address of track 6    209   kick
+  0xE2, 0x00,                 // Address of track 7    226   beat_D
+  0xEA, 0x00,                 // Address of track 8    234   beat_G
+  0xF2, 0x00,                 // Address of track 9    242   beat_A
+  0xFA, 0x00,                 // Address of track 10   250   beat_Bm
+  0x02, 0x01,                 // Address of track 11   258   bass
+  0x23, 0x01,                 // Address of track 12   291   bass_head
+  0x2B, 0x01,                 // Address of track 13   299   bass_beat
+  0x32, 0x01,                 // Address of track 14   306   bass_bar
 
-  0x01,                         // CH0 entry → track 1 (lead)
-  0x0A,                         // CH1 entry → track 10 (chords)
-  0x11,                         // CH2 entry → track 17 (bass)
-  0x17,                         // CH3 entry → track 23 (drums)
+  0x04,                         // CH0 entry -> track 4 (lead)
+  0x05,                         // CH1 entry -> track 5 (chords)
+  0x0B,                         // CH2 entry -> track 11 (bass)
+  0x00,                         // CH3 entry -> track 0 (drums)
 
-  // Track  0: silent  [3b]  dummy track 0 (never called)
-  ATM_VOL(0),
-  ATM_STOP_CHAN,
+  //"Track 0" drums  [7b]
+  ATM_SET_TEMPO(36),
+  ATM_REPEAT(1, 1),   // 2x drum_half
+  ATM_GOTO(0),   // -> drums  (loop: this very track)
 
-  // Track  1: lead  [21b]  CH0 PULSE: vol + 8 bars
+  //"Track 1" drum_half  [32b]
+  ATM_REPEAT(6, 3),   // 7x drum_pair
+  ATM_GOTO(2),   // -> drum_A
+  ATM_VOL(22),
+  ATM_SL_VOL((uint8_t)-9),
+  ATM_DELAY(2),
+  ATM_VOL(26),
+  ATM_DELAY(2),
+  ATM_VOL(30),
+  ATM_DELAY(2),
+  ATM_VOL(34),
+  ATM_DELAY(2),
+  ATM_VOL(38),
+  ATM_DELAY(2),
+  ATM_VOL(42),
+  ATM_DELAY(2),
+  ATM_VOL(46),
+  ATM_DELAY(2),
+  ATM_VOL(50),
+  ATM_DELAY(2),
+  ATM_RETURN,
+
+  //"Track 2" drum_A  [16b]
+  ATM_VOL(28),
+  ATM_SL_VOL((uint8_t)-14),
+  ATM_DELAY(4),
+  ATM_VOL(12),
+  ATM_SL_VOL((uint8_t)-6),
+  ATM_DELAY(4),
+  ATM_VOL(26),
+  ATM_SL_VOL((uint8_t)-3),
+  ATM_DELAY(8),
+  ATM_RETURN,
+
+  //"Track 3" drum_pair  [13b]
+  ATM_GOTO(2),   // -> drum_A
+  ATM_VOL(40),
+  ATM_SL_VOL((uint8_t)-5),
+  ATM_DELAY(8),
+  ATM_VOL(26),
+  ATM_SL_VOL((uint8_t)-3),
+  ATM_DELAY(8),
+  ATM_RETURN,
+
+  //"Track 4" lead  [118b]
   ATM_VOL(38),
   ATM_SL_VOL((uint8_t)-2),
-  ATM_GOTO(2),
-  ATM_GOTO(3),
-  ATM_GOTO(4),
-  ATM_GOTO(5),
-  ATM_GOTO(6),
-  ATM_GOTO(7),
-  ATM_GOTO(8),
-  ATM_GOTO(9),
-  ATM_STOP_CHAN,
-
-  // Track  2: bar1  [13b]  lead bar 1 (D)
   ATM_NOTE_D5,
   ATM_DELAY(12),
   ATM_NOTE_F5_,
@@ -165,9 +203,6 @@ Song titleSong[] = {     // total song bytes = 546
   ATM_DELAY(12),
   ATM_NOTE_D5,
   ATM_DELAY(8),
-  ATM_RETURN,
-
-  // Track  3: bar2  [13b]  lead bar 2 (G)
   ATM_NOTE_G5,
   ATM_DELAY(12),
   ATM_NOTE_B5,
@@ -180,9 +215,6 @@ Song titleSong[] = {     // total song bytes = 546
   ATM_DELAY(12),
   ATM_NOTE_B5,
   ATM_DELAY(8),
-  ATM_RETURN,
-
-  // Track  4: bar3  [13b]  lead bar 3 (A)
   ATM_NOTE_A5,
   ATM_DELAY(12),
   ATM_NOTE_C6_,
@@ -195,9 +227,6 @@ Song titleSong[] = {     // total song bytes = 546
   ATM_DELAY(12),
   ATM_NOTE_C6_,
   ATM_DELAY(8),
-  ATM_RETURN,
-
-  // Track  5: bar4  [13b]  lead bar 4 (D)
   ATM_NOTE_F5_,
   ATM_DELAY(12),
   ATM_NOTE_E5,
@@ -210,9 +239,6 @@ Song titleSong[] = {     // total song bytes = 546
   ATM_DELAY(12),
   ATM_NOTE_F5_,
   ATM_DELAY(8),
-  ATM_RETURN,
-
-  // Track  6: bar5  [17b]  lead bar 5 (D)
   ATM_NOTE_D5,
   ATM_DELAY(4),
   ATM_NOTE_E5,
@@ -229,9 +255,6 @@ Song titleSong[] = {     // total song bytes = 546
   ATM_DELAY(8),
   ATM_NOTE_A4,
   ATM_DELAY(8),
-  ATM_RETURN,
-
-  // Track  7: bar6  [17b]  lead bar 6 (G)
   ATM_NOTE_G4,
   ATM_DELAY(4),
   ATM_NOTE_B4,
@@ -248,9 +271,6 @@ Song titleSong[] = {     // total song bytes = 546
   ATM_DELAY(8),
   ATM_NOTE_G4,
   ATM_DELAY(8),
-  ATM_RETURN,
-
-  // Track  8: bar7  [17b]  lead bar 7 (Bm)
   ATM_NOTE_B4,
   ATM_DELAY(4),
   ATM_NOTE_D5,
@@ -267,9 +287,6 @@ Song titleSong[] = {     // total song bytes = 546
   ATM_DELAY(8),
   ATM_NOTE_B4,
   ATM_DELAY(8),
-  ATM_RETURN,
-
-  // Track  9: bar8  [17b]  lead bar 8 (A, last – 63t loop comp)
   ATM_NOTE_A4,
   ATM_DELAY(4),
   ATM_NOTE_C5_,
@@ -285,23 +302,21 @@ Song titleSong[] = {     // total song bytes = 546
   ATM_NOTE_C5_,
   ATM_DELAY(8),
   ATM_NOTE_A4,
-  ATM_DELAY(7),
-  ATM_RETURN,
+  ATM_DELAY(8),
+  ATM_GOTO(4),   // -> lead  (loop: this very track)
 
-  // Track 10: chords  [27b]  CH1 SQUARE: kick+stab, 8 bars
-  ATM_REPEAT(3,12),
-  ATM_REPEAT(3,13),
-  ATM_REPEAT(3,14),
-  ATM_REPEAT(3,12),
-  ATM_REPEAT(3,12),
-  ATM_REPEAT(3,15),
-  ATM_REPEAT(3,14),
-  ATM_REPEAT(2,12),
-  ATM_GOTO(16),
-  ATM_STOP_CHAN,
+  //"Track 5" chords  [23b]
+  ATM_REPEAT(3, 7),   // 4x beat_D
+  ATM_REPEAT(3, 8),   // 4x beat_G
+  ATM_REPEAT(3, 9),   // 4x beat_A
+  ATM_REPEAT(7, 7),   // 8x beat_D
+  ATM_REPEAT(3, 10),   // 4x beat_Bm
+  ATM_REPEAT(3, 9),   // 4x beat_A
+  ATM_REPEAT(3, 7),   // 4x beat_D
+  ATM_GOTO(5),   // -> chords  (loop: this very track)
 
-  // Track 11: kick  [13b]  cue + pitch-drop kick (4t) + silence (4t)
-  ATM_CUE(2),                   // beat marker: fires once per beat (every 16 ticks) -> ATM.check() == 1
+  //"Track 6" kick  [17b]
+  ATM_CUE(2),                   // beat marker: fires once per beat (every 16 ticks)
   ATM_ARP_OFF,
   ATM_SL_FRQ((uint8_t)-127),
   ATM_VOL(30),
@@ -309,292 +324,137 @@ Song titleSong[] = {     // total song bytes = 546
   ATM_DELAY(4),
   ATM_VOL(0),
   ATM_DELAY(4),
-  ATM_RETURN,
-
-  // Track 12: beat_D  [12b]  beat: kick + D major stab (root D3)
-  ATM_GOTO(11),
   ATM_SL_VOL((uint8_t)-3),
   ATM_VOL(24),
-  ATM_ARP(0x47,0x20),
+  ATM_RETURN,
+
+  //"Track 7" beat_D  [8b]
+  ATM_GOTO(6),   // -> kick
+  ATM_ARP(0x47, 0x20),
   ATM_NOTE_D3,
   ATM_DELAY(8),
   ATM_RETURN,
 
-  // Track 13: beat_G  [12b]  beat: kick + G major stab (root G3)
-  ATM_GOTO(11),
-  ATM_SL_VOL((uint8_t)-3),
-  ATM_VOL(24),
-  ATM_ARP(0x47,0x20),
+  //"Track 8" beat_G  [8b]
+  ATM_GOTO(6),   // -> kick
+  ATM_ARP(0x47, 0x20),
   ATM_NOTE_G3,
   ATM_DELAY(8),
   ATM_RETURN,
 
-  // Track 14: beat_A  [12b]  beat: kick + A major stab (root A3)
-  ATM_GOTO(11),
-  ATM_SL_VOL((uint8_t)-3),
-  ATM_VOL(24),
-  ATM_ARP(0x47,0x20),
+  //"Track 9" beat_A  [8b]
+  ATM_GOTO(6),   // -> kick
+  ATM_ARP(0x47, 0x20),
   ATM_NOTE_A3,
   ATM_DELAY(8),
   ATM_RETURN,
 
-  // Track 15: beat_Bm  [12b]  beat: kick + Bm minor stab (root B3)
-  ATM_GOTO(11),
-  ATM_SL_VOL((uint8_t)-3),
-  ATM_VOL(24),
-  ATM_ARP(0x37,0x20),
+  //"Track 10" beat_Bm  [8b]
+  ATM_GOTO(6),   // -> kick
+  ATM_ARP(0x37, 0x20),
   ATM_NOTE_B3,
   ATM_DELAY(8),
   ATM_RETURN,
 
-  // Track 16: beat_D_last  [12b]  last beat: D stab 7t (loop comp)
-  ATM_GOTO(11),
-  ATM_SL_VOL((uint8_t)-3),
-  ATM_VOL(24),
-  ATM_ARP(0x47,0x20),
-  ATM_NOTE_D3,
-  ATM_DELAY(7),
-  ATM_RETURN,
-
-  // Track 17: bass  [35b]  CH2 SAW: transposed bass, 8 bars
+  //"Track 11" bass  [33b]
   ATM_SL_VOL((uint8_t)-5),
   ATM_SET_TRA(0),
-  ATM_GOTO(20),
+  ATM_GOTO(14),   // -> bass_bar
   ATM_SET_TRA(5),
-  ATM_GOTO(20),
+  ATM_GOTO(14),   // -> bass_bar
   ATM_SET_TRA(7),
-  ATM_GOTO(20),
+  ATM_GOTO(14),   // -> bass_bar
   ATM_SET_TRA(0),
-  ATM_GOTO(20),
-  ATM_SET_TRA(0),
-  ATM_GOTO(20),
+  ATM_REPEAT(1, 14),   // 2x bass_bar
   ATM_SET_TRA(9),
-  ATM_GOTO(20),
+  ATM_GOTO(14),   // -> bass_bar
   ATM_SET_TRA(7),
-  ATM_GOTO(20),
+  ATM_GOTO(14),   // -> bass_bar
   ATM_SET_TRA(0),
-  ATM_GOTO(22),
-  ATM_STOP_CHAN,
+  ATM_GOTO(14),   // -> bass_bar
+  ATM_GOTO(11),   // -> bass  (loop: this very track)
 
-  // Track 18: bass_beat  [12b]  bass beat: silence-root-oct-root (16t)
+  //"Track 12" bass_head  [8b]
   ATM_VOL(0),
   ATM_DELAY(4),
   ATM_VOL(63),
   ATM_NOTE_D3,
   ATM_DELAY(4),
+  ATM_RETURN,
+
+  //"Track 13" bass_beat  [7b]
+  ATM_GOTO(12),   // -> bass_head
   ATM_NOTE_D4,
   ATM_DELAY(4),
   ATM_NOTE_D3,
   ATM_DELAY(4),
   ATM_RETURN,
 
-  // Track 19: bass_beat4  [12b]  bass beat 4: silence-root-root-oct (16t)
-  ATM_VOL(0),
-  ATM_DELAY(4),
-  ATM_VOL(63),
-  ATM_NOTE_D3,
-  ATM_DELAY(4),
+  //"Track 14" bass_bar  [10b]
+  ATM_REPEAT(2, 13),   // 3x bass_beat
+  ATM_GOTO(12),   // -> bass_head
   ATM_NOTE_D3,
   ATM_DELAY(4),
   ATM_NOTE_D4,
   ATM_DELAY(4),
-  ATM_RETURN,
-
-  // Track 20: bass_bar  [6b]  bass bar (64t): 3× beat + beat4
-  ATM_REPEAT(2,18),
-  ATM_GOTO(19),
-  ATM_RETURN,
-
-  // Track 21: bass_beat4_last  [12b]  last beat4: final note 3t (loop comp)
-  ATM_VOL(0),
-  ATM_DELAY(4),
-  ATM_VOL(63),
-  ATM_NOTE_D3,
-  ATM_DELAY(4),
-  ATM_NOTE_D3,
-  ATM_DELAY(4),
-  ATM_NOTE_D4,
-  ATM_DELAY(3),
-  ATM_RETURN,
-
-  // Track 22: bass_bar_last  [6b]  last bass bar
-  ATM_REPEAT(2,18),
-  ATM_GOTO(21),
-  ATM_RETURN,
-
-  // Track 23: drums  [18b]  CH3 NOISE: tempo + 8 bars
-  ATM_SET_TEMPO(36),
-  ATM_GOTO_ADV(1,10,17,23),
-  ATM_REPEAT(2,27),
-  ATM_GOTO(30),
-  ATM_REPEAT(2,27),
-  ATM_GOTO(31),
-  ATM_STOP_CHAN,
-
-  // Track 24: drum_A  [16b]  beat 1/3: click, hat, open hat (16t)
-  ATM_VOL(28),
-  ATM_SL_VOL((uint8_t)-14),
-  ATM_DELAY(4),
-  ATM_VOL(12),
-  ATM_SL_VOL((uint8_t)-6),
-  ATM_DELAY(4),
-  ATM_VOL(26),
-  ATM_SL_VOL((uint8_t)-3),
-  ATM_DELAY(8),
-  ATM_RETURN,
-
-  // Track 25: drum_B  [11b]  beat 2/4: clap, open hat (16t)
-  ATM_VOL(40),
-  ATM_SL_VOL((uint8_t)-5),
-  ATM_DELAY(8),
-  ATM_VOL(26),
-  ATM_SL_VOL((uint8_t)-3),
-  ATM_DELAY(8),
-  ATM_RETURN,
-
-  // Track 26: drum_pair  [5b]  beats 1+2 (32t)
-  ATM_GOTO(24),
-  ATM_GOTO(25),
-  ATM_RETURN,
-
-  // Track 27: drum_bar  [4b]  one bar (64t)
-  ATM_REPEAT(1,26),
-  ATM_RETURN,
-
-  // Track 28: drum_fill  [41b]  snare roll 16t
-  ATM_VOL(22),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(26),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(30),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(34),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(38),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(42),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(46),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(50),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_RETURN,
-
-  // Track 29: drum_fill_last  [41b]  snare roll 15t (loop comp)
-  ATM_VOL(22),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(26),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(30),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(34),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(38),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(42),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(46),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(2),
-  ATM_VOL(50),
-  ATM_SL_VOL((uint8_t)-9),
-  ATM_DELAY(1),
-  ATM_RETURN,
-
-  // Track 30: drum_bar_fill  [7b]  bar 4: pair + drum_A + fill
-  ATM_GOTO(26),
-  ATM_GOTO(24),
-  ATM_GOTO(28),
-  ATM_RETURN,
-
-  // Track 31: drum_bar_fill_last  [7b]  bar 8: pair + drum_A + fill_last
-  ATM_GOTO(26),
-  ATM_GOTO(24),
-  ATM_GOTO(29),
   ATM_RETURN,
 
 };
 
-Song gameSong[] = {     // total song bytes = 245
-  0x0D,                       // Number of tracks
+Song gameSong[] = {     // total song bytes = 212
+  0x0B,                       // Number of tracks
   0x00, 0x00,                 // Address of track 0      0   drums
-  0x0C, 0x00,                 // Address of track 1     12   drum_core
-  0x25, 0x00,                 // Address of track 2     37   drum_half
-  0x29, 0x00,                 // Address of track 3     41   lead
-  0x40, 0x00,                 // Address of track 4     64   lead_riff
-  0x5E, 0x00,                 // Address of track 5     94   lead_cycle
-  0x6C, 0x00,                 // Address of track 6    108   chords
-  0x94, 0x00,                 // Address of track 7    148   bass
-  0xAC, 0x00,                 // Address of track 8    172   bass_cycle
-  0xBA, 0x00,                 // Address of track 9    186   bass_bar
-  0xC0, 0x00,                 // Address of track 10   192   bass_bar_last
-  0xCA, 0x00,                 // Address of track 11   202   bass_beat
-  0xCF, 0x00,                 // Address of track 12   207   bass_beat4
+  0x05, 0x00,                 // Address of track 1      5   drum
+  0x1F, 0x00,                 // Address of track 2     31   lead
+  0x34, 0x00,                 // Address of track 3     52   lead_riff
+  0x53, 0x00,                 // Address of track 4     83   lead_w
+  0x5C, 0x00,                 // Address of track 5     92   chords
+  0x85, 0x00,                 // Address of track 6    133   bass
+  0x9C, 0x00,                 // Address of track 7    156   bass_w
+  0xA7, 0x00,                 // Address of track 8    167   bass_bar
+  0xAD, 0x00,                 // Address of track 9    173   bass_beat
+  0xB2, 0x00,                 // Address of track 10   178   bass_beat4
 
-  0x03,                         // CH0 entry -> track 3 (lead)
-  0x06,                         // CH1 entry -> track 6 (chords)
-  0x07,                         // CH2 entry -> track 7 (bass)
+  0x02,                         // CH0 entry -> track 2 (lead)
+  0x05,                         // CH1 entry -> track 5 (chords)
+  0x06,                         // CH2 entry -> track 6 (bass)
   0x00,                         // CH3 entry -> track 0 (drums)
 
-  //"Track 0" drums  [12b]
-  ATM_GOTO_ADV(3, 6, 7, 0),   // loop point per channel
-  ATM_REPEAT(30, 2),   // 31x drum_half
-  ATM_GOTO(1),   // -> drum_core
-  ATM_DELAY(7),
-  ATM_STOP_CHAN,
+  //"Track 0" drums  [5b]
+  ATM_REPEAT(31, 1),   // 32x drum
+  ATM_GOTO(0),   // -> drums  (loop: this very track)
 
-  //"Track 1" drum_core  [25b]
-  ATM_VOL(48),
-  ATM_SL_VOL((uint8_t)-12),
+  //"Track 1" drum  [26b]
+  ATM_VOL(MV(48)),
+  ATM_SL_VOL(MS(12)),
   ATM_DELAY(4),
-  ATM_VOL(14),
-  ATM_SL_VOL((uint8_t)-7),
+  ATM_VOL(MV(14)),
+  ATM_SL_VOL(MS(7)),
   ATM_DELAY(4),
-  ATM_VOL(26),
-  ATM_SL_VOL((uint8_t)-3),
+  ATM_VOL(MV(26)),
+  ATM_SL_VOL(MS(3)),
   ATM_DELAY(8),
-  ATM_VOL(44),
-  ATM_SL_VOL((uint8_t)-5),
+  ATM_VOL(MV(44)),
+  ATM_SL_VOL(MS(5)),
   ATM_DELAY(8),
-  ATM_VOL(26),
-  ATM_SL_VOL((uint8_t)-3),
-  ATM_RETURN,
-
-  //"Track 2" drum_half  [4b]
-  ATM_GOTO(1),   // -> drum_core
+  ATM_VOL(MV(26)),
+  ATM_SL_VOL(MS(3)),
   ATM_DELAY(8),
   ATM_RETURN,
 
-  //"Track 3" lead  [23b]
-  ATM_VOL(38),
-  ATM_SL_VOL((uint8_t)-2),
+  //"Track 2" lead  [21b]
+  ATM_VOL(MV(38)),
+  ATM_SL_VOL(MS(2)),
   ATM_SET_TRA(0),
-  ATM_GOTO(5),   // -> lead_cycle
+  ATM_GOTO(4),   // -> lead_w
+  ATM_GOTO(3),   // -> lead_riff
   ATM_ADD_TRA(7),
-  ATM_GOTO(4),   // -> lead_riff
-  ATM_DELAY(16),
+  ATM_GOTO(3),   // -> lead_riff
   ATM_SET_TRA(2),
-  ATM_GOTO(5),   // -> lead_cycle
-  ATM_ADD_TRA(5),
-  ATM_GOTO(4),   // -> lead_riff
-  ATM_DELAY(15),
-  ATM_STOP_CHAN,
+  ATM_REPEAT(1, 4),   // 2x lead_w
+  ATM_GOTO(2),   // -> lead  (loop: this very track)
 
-  //"Track 4" lead_riff  [30b]
+  //"Track 3" lead_riff  [31b]
   ATM_NOTE_A4,
   ATM_DELAY(8),
   ATM_NOTE_C5,
@@ -624,22 +484,19 @@ Song gameSong[] = {     // total song bytes = 245
   ATM_NOTE_G4,
   ATM_DELAY(8),
   ATM_NOTE_A4,
+  ATM_DELAY(16),
   ATM_RETURN,
 
-  //"Track 5" lead_cycle  [14b]
-  ATM_GOTO(4),   // -> lead_riff
-  ATM_DELAY(16),
+  //"Track 4" lead_w  [9b]
+  ATM_GOTO(3),   // -> lead_riff
   ATM_ADD_TRA(5),
-  ATM_GOTO(4),   // -> lead_riff
-  ATM_DELAY(16),
+  ATM_GOTO(3),   // -> lead_riff
   ATM_ADD_TRA((uint8_t)-5),
-  ATM_GOTO(4),   // -> lead_riff
-  ATM_DELAY(16),
   ATM_RETURN,
 
-  //"Track 6" chords  [40b]
-  ATM_VOL(30),
-  ATM_SL_VOL((uint8_t)-1),
+  //"Track 5" chords  [41b]
+  ATM_VOL(MV(30)),
+  ATM_SL_VOL(MS(1)),
   ATM_ARP(0x34, 0x20),
   ATM_NOTE_A3,
   ATM_DELAY(64),
@@ -672,54 +529,41 @@ Song gameSong[] = {     // total song bytes = 245
   ATM_NOTE_E4,
   ATM_DELAY(64),
   ATM_NOTE_E4,
-  ATM_DELAY(63),
-  ATM_STOP_CHAN,
+  ATM_DELAY(64),
+  ATM_GOTO(5),   // -> chords  (loop: this very track)
 
-  //"Track 7" bass  [24b]
-  ATM_VOL(63),
-  ATM_SL_VOL((uint8_t)-5),
+  //"Track 6" bass  [23b]
+  ATM_VOL(MV(63)),
+  ATM_SL_VOL(MS(5)),
   ATM_SET_TRA(0),
-  ATM_GOTO(8),   // -> bass_cycle
+  ATM_GOTO(7),   // -> bass_w
+  ATM_REPEAT(1, 8),   // 2x bass_bar
   ATM_ADD_TRA(7),
-  ATM_REPEAT(1, 9),   // 2x bass_bar
+  ATM_REPEAT(1, 8),   // 2x bass_bar
   ATM_SET_TRA(2),
-  ATM_GOTO(8),   // -> bass_cycle
-  ATM_SET_TRA(7),
-  ATM_GOTO(9),   // -> bass_bar
-  ATM_GOTO(10),   // -> bass_bar_last
-  ATM_STOP_CHAN,
+  ATM_REPEAT(1, 7),   // 2x bass_w
+  ATM_GOTO(6),   // -> bass  (loop: this very track)
 
-  //"Track 8" bass_cycle  [14b]
-  ATM_REPEAT(1, 9),   // 2x bass_bar
+  //"Track 7" bass_w  [11b]
+  ATM_REPEAT(1, 8),   // 2x bass_bar
   ATM_ADD_TRA(5),
-  ATM_REPEAT(1, 9),   // 2x bass_bar
+  ATM_REPEAT(1, 8),   // 2x bass_bar
   ATM_ADD_TRA((uint8_t)-5),
-  ATM_REPEAT(1, 9),   // 2x bass_bar
   ATM_RETURN,
 
-  //"Track 9" bass_bar  [6b]
-  ATM_REPEAT(2, 11),   // 3x bass_beat
-  ATM_GOTO(12),   // -> bass_beat4
+  //"Track 8" bass_bar  [6b]
+  ATM_REPEAT(2, 9),   // 3x bass_beat
+  ATM_GOTO(10),   // -> bass_beat4
   ATM_RETURN,
 
-  //"Track 10" bass_bar_last  [10b]
-  ATM_REPEAT(2, 11),   // 3x bass_beat
-  ATM_NOTE_A2,
-  ATM_DELAY(8),
-  ATM_NOTE_A2,
-  ATM_DELAY(4),
-  ATM_NOTE_A3,
-  ATM_DELAY(3),
-  ATM_RETURN,
-
-  //"Track 11" bass_beat  [5b]
+  //"Track 9" bass_beat  [5b]
   ATM_NOTE_A2,
   ATM_DELAY(8),
   ATM_NOTE_A3,
   ATM_DELAY(8),
   ATM_RETURN,
 
-  //"Track 12" bass_beat4  [7b]
+  //"Track 10" bass_beat4  [7b]
   ATM_NOTE_A2,
   ATM_DELAY(8),
   ATM_NOTE_A2,

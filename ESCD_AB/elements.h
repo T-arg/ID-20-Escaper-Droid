@@ -80,7 +80,11 @@ void drawObject()
 {
   if (objectHiddenThisVisit) return;
   if (arduboy.everyXFrames(8)) elements[OBJECT].frame = (++elements[OBJECT].frame) % 6;
-  sprites.drawPlusMask(elements[OBJECT].x + 4, elements[OBJECT].y + currentRoomY + 6, elements_plus_mask, elements[OBJECT].frame + (6 * ((elements[OBJECT].characteristics & 0b00000111))));
+  byte type = elements[OBJECT].characteristics & 0b00000111;
+  byte fr = elements[OBJECT].frame;
+  // types 0-5 have 6 frames each; the two switches only have 2 frames each (frames 36-39), held for 3 steps
+  fr = (type >= SWITCH_OFF) ? (6 * SWITCH_OFF + 2 * (type - SWITCH_OFF) + fr / 3) : (fr + 6 * type);
+  sprites.drawPlusMask(elements[OBJECT].x + 4, elements[OBJECT].y + currentRoomY + 6, elements_plus_mask, fr);
 }
 
 void drawFloor(byte floor)

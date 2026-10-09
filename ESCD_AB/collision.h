@@ -13,7 +13,7 @@ void isoStep(int &x, int &y, byte dir)
   y += (dir > EAST) ? 1 : -1;
 }
 
-boolean hitBorders(int objectX, int objectY, int directionFacing, bool playerOrEnemy)
+boolean hitBorders(int objectX, int objectY, byte directionFacing, bool playerOrEnemy)
 {
   directionFacing &= 3;
   switch (directionFacing)
@@ -45,6 +45,7 @@ void playerChecksAndOpensDoor(byte direction)
   {
     player.assets -= need;
     scorePlayer += isLevel ? SCORE_LEVEL_DOOR : SCORE_OPEN_DOOR;
+    play_SFX(SFX_DOOROPEN);
     bitClear(stageRoom[currentRoom].doorsClosedActive, direction);
   }
   else
@@ -109,7 +110,7 @@ byte tileIsOccupied(byte tileTesting, bool playerOrEnemy, bool enemyTwo)
 
 bool kickPlayer(byte dir);
 
-boolean hitObjects (int objectX, int objectY, int directionFacing, bool playerOrEnemy, bool enemy)
+boolean hitObjects (int objectX, int objectY, byte directionFacing, bool playerOrEnemy, bool enemy)
 {
   directionFacing &= 3;
   switch (directionFacing)
@@ -223,6 +224,7 @@ boolean tryPushBox(byte slot, byte dir)
   if (itemsOrder[dest + ITEMS_ORDER_TILES_START] != EMPTY_PLACE) return false;
   elements[slot].x = translateTileToX(dest);
   elements[slot].y = translateTileToY(dest);
+  play_SFX(SFX_KICK);
   return true;
 }
 
@@ -246,6 +248,7 @@ bool kickPlayer(byte dir)
   currentRoomY = setCurrentRoomY(dest);
   player.x = translateTileToX(dest);
   player.y = translateTileToY(dest) + currentRoomY;
+  play_SFX(SFX_KICK);          // played first so the hurt sound takes over if the shove lands on a foe or spikes
   if (foe || spike) playerLosesLife();
   return true;
 }
@@ -297,6 +300,7 @@ void decideOnCollision()
 void killEnemy(byte enemySlot)
 {
   scorePlayer += SCORE_ENEMY_HIT;
+  play_SFX(SFX_KILL);
   if ((elements[enemySlot].characteristics & 7) == ENEMY_SHOOTER)
   {
     byte tile = tileFromXY(elements[enemySlot].x, elements[enemySlot].y);
@@ -323,6 +327,7 @@ bool shotHitsBlockingFloor(byte occupant)
   if (kind == FLOOR_PIT) return false;
   if (kind == FLOOR_PIRAMIDE)
   {
+    play_SFX(SFX_PIRAMIDE);
     bitClear(stageRoom[currentRoom].elementsActive, 7 - occupant);
     elements[occupant].characteristics = 0;
     return true;

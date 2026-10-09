@@ -17,6 +17,8 @@ byte soundMode = 0;
 #define SFX_SWITCH            7
 #define SFX_KILL              8
 #define SFX_PIRAMIDE          9
+#define SFX_DOOROPEN          10
+#define SFX_KICK              11
 
 const uint8_t sfxDoorClosed[] PROGMEM = {
   ATM_VOL(63),
@@ -120,9 +122,32 @@ const uint8_t clearThePiramide[] PROGMEM = {
   ATM_STOP_CHAN,
 };
 
+const uint8_t openTheDoor[] PROGMEM = {   // rising "slide open" blip on the square channel
+  ATM_VOL(63),
+  ATM_SL_VOL(-4),
+  ATM_NOTE_C3,
+  ATM_DELAY(2),
+  ATM_NOTE_G3,
+  ATM_DELAY(2),
+  ATM_NOTE_C4,
+  ATM_DELAY(2),
+  ATM_NOTE_G4,
+  ATM_DELAY(8),
+  ATM_STOP_CHAN,
+};
+
+const uint8_t kickBlock[] PROGMEM = {   // short dull thud: pitch drops while it fades
+  ATM_VOL(63),
+  ATM_SL_VOL(-8),
+  ATM_GLIS(0B10000001),
+  ATM_NOTE_G3,
+  ATM_DELAY(6),
+  ATM_STOP_CHAN,
+};
+
 const unsigned char * const PROGMEM soundFX[] =
 {
-  sfxDoorClosed, pickUp, menuClick, shootBullet, levelUp, beamMeUpScotty, youHurtMe, useSwitch, killTheEnemy, clearThePiramide
+  sfxDoorClosed, pickUp, menuClick, shootBullet, levelUp, beamMeUpScotty, youHurtMe, useSwitch, killTheEnemy, clearThePiramide, openTheDoor, kickBlock
 };
 
 const uint8_t intro[] PROGMEM = {
@@ -143,12 +168,5 @@ const uint8_t intro[] PROGMEM = {
   ATM_STOP_CHAN,
 };
 
-const uint8_t openTheDoor[] PROGMEM = {
-  ATM_VOL(0),
-  ATM_NOISE(0B00111010),
-  ATM_SL_VOL(4),
-  ATM_DELAY(16),
-  ATM_STOP_CHAN,
-};
 
 #endif

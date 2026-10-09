@@ -105,7 +105,7 @@ void statePrepForPause()
 
 void statePrepForRoom()
 {
-  loadAndFillMessage(12+(currentRoom%8));
+  loadAndFillMessage(10+(currentRoom%8));
   setTicker = TEXT_SCROLL_LEFT;
   showTicker = TRUE;
   gameState = STATE_GAME_PLAYING;

@@ -27,6 +27,7 @@ void stateGameNew()
 
 void stateGameContinue()
 {
+  if (level > 0) level--;   // EEPROM holds the level being played; NEXT_LEVEL does level++ so step back to replay it
   scorePlayer = 0;
   player.set();
   gameState = STATE_GAME_NEXT_LEVEL;
@@ -138,8 +139,10 @@ void stateGameNextLevel()
 {
   level++;
   player.life = 3;
+  bool finished = (level > AMOUNT_OF_LEVELS);
+  if (finished) level = 0;               // game completed: the saved progress goes back to the start
   EEPROM.write(OFFSET_LEVEL,level);
-  if (level > AMOUNT_OF_LEVELS)
+  if (finished)
   {
     loadAndFillMessage(7);
     addNumber(scorePlayer,24,6);
