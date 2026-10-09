@@ -94,6 +94,8 @@ bool showTicker;
 bool danceDroid = 0;
 byte showMask = 0;
 bool objectHiddenThisVisit;  // ammo pickup hides until you leave the room
+byte gameTempo = 36;         // tempo of the song that is playing in the game (set by playGameMusic)
+bool musicPending;           // a new level starts: play its song when the player leaves the level screen
 
 void statePrepForPause()
 {

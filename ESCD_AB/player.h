@@ -99,7 +99,7 @@ void spawnPlayerShot()
 
 void songSpeedChange()
 {
-  ATM.setTempo(player.life > 1 ? TEMPO_NORMAL : TEMPO_FAST);
+  ATM.setTempo(gameTempo + (player.life > 1 ? 0 : 4));   // low on life: 4 ticks per second faster
 }
 
 void walkThroughDoor()

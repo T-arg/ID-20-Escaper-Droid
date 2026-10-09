@@ -7,8 +7,10 @@
 
 void playGameMusic()
 {
-  ATM.play(gameSong);
-  ATM.setTempo(TEMPO_NORMAL);
+  byte s = (level - 1) & 3;          // level 1 = song 0 ... level 5 starts over with song 0
+  gameTempo = pgm_read_byte(&gameSongTempo[s]);
+  ATM.play((const uint8_t *)pgm_read_word(&gameSongs[s]));
+  ATM.setTempo(gameTempo);
   if (soundMode >= 2) ATM.pause();   // SFX only: keep ISR, freeze score
 }
 
@@ -22,7 +24,6 @@ void stateGameNew()
   EEPROM.write(OFFSET_BUTTONS,buttonSchemeOffset);
   EEPROM.write(OFFSET_ESCD_END,GAME_ID);
   gameState = STATE_GAME_NEXT_LEVEL;
-  playGameMusic();
 }
 
 void stateGameContinue()
@@ -31,7 +32,6 @@ void stateGameContinue()
   scorePlayer = 0;
   player.set();
   gameState = STATE_GAME_NEXT_LEVEL;
-  playGameMusic();
 }
 
 void stateMenuPlay()
@@ -158,6 +158,7 @@ void stateGameNextLevel()
     buildRooms();
     enterRoom(currentRoom);
     statePrepForPause();
+    musicPending = TRUE;         // the song of this level starts when the player leaves this screen
     gameState = STATE_GAME_PAUSE;
   }
 }
@@ -170,7 +171,12 @@ void stateGamePause()
   drawHUD();
   if (arduboy.justPressed(A_BUTTON | B_BUTTON))
   {
-    ATM.resume();
+    if (musicPending)
+    {
+      musicPending = FALSE;
+      playGameMusic();
+    }
+    else if (soundMode < 2) ATM.resume();   // back from the pause in the game (SFX only: score stays frozen)
     statePrepForRoom();
   }
 }

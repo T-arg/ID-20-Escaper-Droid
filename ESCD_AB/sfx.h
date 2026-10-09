@@ -4,9 +4,6 @@
 // 0: music + SFX   1: music only   2: SFX only   3: mute
 byte soundMode = 0;
 
-#define TEMPO_NORMAL          36
-#define TEMPO_FAST            40
-
 #define SFX_DOOR              0
 #define SFX_PICKUP            1
 #define SFX_MENU              2
