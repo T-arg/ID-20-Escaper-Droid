@@ -1038,4 +1038,114 @@ const unsigned char * const PROGMEM gameSongs[] =
 
 const uint8_t PROGMEM gameSongTempo[] = { 36, 26, 40, 24 };
 
+// Finishing tune (played once the game is completed), looped until A/B. Full volume like the title song.
+// Tempo is set by the sketch (stateGameNextLevel): ATM.setTempo(34).
+// Happy Disco - finishing tune, 512 ticks/loop, tempo 34
+Song finishDisco[] = {     // total song bytes = 144
+  0x08,                       // Number of tracks
+  0x00, 0x00,                 // Address of track 0      0   lead
+  0x0B, 0x00,                 // Address of track 1     11   riff
+  0x1A, 0x00,                 // Address of track 2     26   cycL
+  0x2B, 0x00,                 // Address of track 3     43   harm
+  0x36, 0x00,                 // Address of track 4     54   bass
+  0x3F, 0x00,                 // Address of track 5     63   beat
+  0x4B, 0x00,                 // Address of track 6     75   cycB
+  0x60, 0x00,                 // Address of track 7     96   drum
+
+  0x00,                         // CH0 entry -> track 0 (lead)
+  0x03,                         // CH1 entry -> track 3 (harm)
+  0x04,                         // CH2 entry -> track 4 (bass)
+  0x07,                         // CH3 entry -> track 7 (drum)
+
+  //"Track 0" lead  [11b]
+  ATM_SET_TRA(0),
+  ATM_VOL(MV(38)),
+  ATM_SL_VOL(MS(2)),
+  ATM_REPEAT(1, 2),   // 2x cycL
+  ATM_GOTO(0),   // -> lead
+
+  //"Track 1" riff  [15b]
+  ATM_NOTE_G4,
+  ATM_DELAY(8),
+  ATM_NOTE_C5,
+  ATM_DELAY(8),
+  ATM_NOTE_E5,
+  ATM_DELAY(8),
+  ATM_NOTE_G5,
+  ATM_DELAY(8),
+  ATM_NOTE_E5,
+  ATM_DELAY(16),
+  ATM_NOTE_D5,
+  ATM_DELAY(8),
+  ATM_NOTE_C5,
+  ATM_DELAY(8),
+  ATM_RETURN,
+
+  //"Track 2" cycL  [17b]
+  ATM_GOTO(1),   // -> riff
+  ATM_ADD_TRA(5),
+  ATM_GOTO(1),   // -> riff
+  ATM_ADD_TRA(2),
+  ATM_GOTO(1),   // -> riff
+  ATM_ADD_TRA((uint8_t)-7),
+  ATM_GOTO(1),   // -> riff
+  ATM_ADD_TRA(7),
+  ATM_RETURN,
+
+  //"Track 3" harm  [11b]
+  ATM_SET_TRA((uint8_t)-12),
+  ATM_VOL(MV(20)),
+  ATM_SL_VOL(MS(1)),
+  ATM_REPEAT(1, 2),   // 2x cycL
+  ATM_GOTO(3),   // -> harm
+
+  //"Track 4" bass  [9b]
+  ATM_SL_VOL(MS(5)),
+  ATM_SET_TRA(0),
+  ATM_REPEAT(1, 6),   // 2x cycB
+  ATM_GOTO(4),   // -> bass
+
+  //"Track 5" beat  [12b]
+  ATM_VOL(MV(0)),
+  ATM_DELAY(4),
+  ATM_VOL(MV(63)),
+  ATM_NOTE_C3,
+  ATM_DELAY(4),
+  ATM_NOTE_C4,
+  ATM_DELAY(4),
+  ATM_NOTE_C3,
+  ATM_DELAY(4),
+  ATM_RETURN,
+
+  //"Track 6" cycB  [21b]
+  ATM_REPEAT(3, 5),   // 4x beat
+  ATM_ADD_TRA(5),
+  ATM_REPEAT(3, 5),   // 4x beat
+  ATM_ADD_TRA(2),
+  ATM_REPEAT(3, 5),   // 4x beat
+  ATM_ADD_TRA((uint8_t)-7),
+  ATM_REPEAT(3, 5),   // 4x beat
+  ATM_ADD_TRA(7),
+  ATM_RETURN,
+
+  //"Track 7" drum  [27b]
+  ATM_VOL(MV(28)),
+  ATM_SL_VOL(MS(14)),
+  ATM_DELAY(4),
+  ATM_VOL(MV(12)),
+  ATM_SL_VOL(MS(6)),
+  ATM_DELAY(4),
+  ATM_VOL(MV(26)),
+  ATM_SL_VOL(MS(3)),
+  ATM_DELAY(8),
+  ATM_VOL(MV(40)),
+  ATM_SL_VOL(MS(5)),
+  ATM_DELAY(8),
+  ATM_VOL(MV(26)),
+  ATM_SL_VOL(MS(3)),
+  ATM_DELAY(8),
+  ATM_GOTO(7),   // -> drum
+
+};
+
 #endif

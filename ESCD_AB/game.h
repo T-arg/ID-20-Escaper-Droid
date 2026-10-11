@@ -147,6 +147,9 @@ void stateGameNextLevel()
     loadAndFillMessage(7);
     addNumber(scorePlayer,24,6);
     gameState = STATE_GAME_FINISHED;
+    ATM.play(finishDisco);
+    ATM.setTempo(34);
+    if (soundMode >= 2) ATM.pause();
   }
   else
   {
