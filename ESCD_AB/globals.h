@@ -76,6 +76,7 @@ Arduboy2Base arduboy;
 Sprites sprites;
 ATMsynth ATM;
 
+byte introFrame = 0;                 // frame counter of the ARDUBOY intro + T-arg logo
 byte gameState = STATE_MENU_INTRO;   // start the game with the intro logo
 byte menuSelection = STATE_MENU_SELECT_PLAY; // PLAY menu item is pre-selected
 byte level;
@@ -119,6 +120,31 @@ void play_SFX(byte idSfx)
   const unsigned char *fx =
     (const unsigned char *)pgm_read_word(&soundFX[idSfx]);
   ATM.playSfx(fx, 1);          // ch1: leave song pulse on ch0
+}
+
+// Draws frame f of a plus-mask sheet that only stores the even frames: stored frame f>>1, mirrored left/right when f is odd
+// (N/E and S/W views are mirror images). Same result as sprites.drawPlusMask, clipped to the screen.
+void drawFlip(int x, int y, const unsigned char *bmp, byte f)
+{
+  byte w = pgm_read_byte(bmp);
+  byte pages = (pgm_read_byte(bmp + 1) + 7) >> 3;
+  const unsigned char *p = bmp + 2 + (unsigned int)(f >> 1) * w * pages * 2;
+  byte *buf = arduboy.getBuffer();
+  byte sh = y & 7;
+  int page = y >> 3;
+  for (byte pg = 0; pg < pages; pg++)
+    for (byte c = 0; c < w; c++)
+    {
+      int sx = x + c;
+      if (sx < 0 || sx > 127) continue;
+      const unsigned char *q = p + (((pg * w) + ((f & 1) ? w - 1 - c : c)) << 1);
+      unsigned int s = (unsigned int)pgm_read_byte(q) << sh;
+      unsigned int m = (unsigned int)pgm_read_byte(q + 1) << sh;
+      int d = page + pg;
+      byte *b = buf + d * 128 + sx;
+      if (d >= 0 && d < 8) *b = (*b & ~(byte)m) | (byte)s;
+      if (sh && d >= -1 && d < 7) { b += 128; *b = (*b & ~(byte)(m >> 8)) | (byte)(s >> 8); }
+    }
 }
 
 void playMenuMusic()

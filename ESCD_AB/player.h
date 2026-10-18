@@ -6,7 +6,8 @@
 #define PLAYER_DROID                      9
 #define PLAYER_BULLET                     10
 #define PLAYER_IMMUNE_TIME                240
-#define PLAYER_TRANSPORTING_TIME          90
+#define PLAYER_TRANSPORTING_TIME          78   // frames: lift off, new room, drop in, one bounce
+#define TRANSPORT_SWITCH_TIME             40   // the droid has left the screen: now switch rooms
 
 #define PLAYER                            1
 
@@ -166,11 +167,6 @@ void updatePlayer()
 void playerTransporting()
 {
   player.transportTimer++;
-  if (arduboy.everyXFrames(4))
-  {
-    if ((player.characteristics & 0b00000011) > 2) player.characteristics = player.characteristics & 0b11111100;
-    else if ((player.characteristics & 0b00000011) < 3) player.characteristics++;
-  }
   if (player.transportTimer > PLAYER_TRANSPORTING_TIME)
   {
     bitSet(player.characteristics,DROID_VISIBLE_AT_BIT_2);
@@ -180,16 +176,29 @@ void playerTransporting()
   }
 }
 
+// how many pixels the droid hangs above its tile while transporting
+int transportLift()
+{
+  byte t = player.transportTimer;
+  if (t < TRANSPORT_SWITCH_TIME) return (t * t) >> 4;     // lifting off, faster and faster, out of the screen
+  t -= TRANSPORT_SWITCH_TIME;                             // dropping into the new room
+  if (t < 20) return 100 - ((t * t) >> 2);
+  t -= 20;                                                // one bounce of 8 pixels
+  return (t < 16) ? ((t * (16 - t)) >> 3) : 0;
+}
+
 void drawPlayer()
 {
   byte counter = player.characteristics & 0b00000011;
-  byte counterTwice = 2*counter;
+  byte counterTwice = (player.transportTimer >> 1) & 6;   // the beam rings slide 2 pixels every 4 frames
+  int y = player.y;
+  if (bitRead(player.characteristics, DROID_TRANSPORTING_AT_BIT_7)) y -= transportLift();
   if (bitRead(player.characteristics, DROID_TRANSPORTING_AT_BIT_7))
   {
     for (byte i = 0; i<17;i=i+8) sprites.drawPlusMask(player.x-4, player.y-6 + i - counterTwice, transportBeams_plus_mask,0);
   }
-  if (bitRead(player.characteristics, DROID_DYING_AT_BIT_4)) sprites.drawPlusMask(player.x, player.y, droid_plus_mask, 4);
-  else if (bitRead(player.characteristics, DROID_VISIBLE_AT_BIT_2)) sprites.drawPlusMask(player.x, player.y, droid_plus_mask, counter);
+  if (bitRead(player.characteristics, DROID_DYING_AT_BIT_4)) drawFlip(player.x, y, droid_plus_mask, 4);
+  else if (bitRead(player.characteristics, DROID_VISIBLE_AT_BIT_2)) drawFlip(player.x, y, droid_plus_mask, counter);
   if (bitRead(player.characteristics, DROID_TRANSPORTING_AT_BIT_7))
   {
     for (byte i = 0; i<17;i=i+8)sprites.drawPlusMask(player.x-4, player.y+2 + i - counterTwice, transportBeams_plus_mask,1);

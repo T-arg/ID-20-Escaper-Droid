@@ -6,6 +6,14 @@
 #include "globals.h"
 #include "room.h"
 
+// the ARDUBOY intro at 45 fps (see the table in arduboy_intro.h)
+#define INTRO_STEP        11
+#define INTRO_TICKS       6
+#define INTRO_SLIDE       15
+#define INTRO_SPEED       8
+#define INTRO_TAIL        15
+#include "arduboy_intro.h"
+
 // main ticker: "      CONF SDFX INFO PLAY"
 // each glyph is 4 columns; words start at charBox x = 24, 44, 64, 84
 PROGMEM const byte menuWordX[] = { 16, 36, 64, 84 };
@@ -57,12 +65,14 @@ void statePrepForMainMenu()
 
 void stateMenuIntro()
 {
-  if (ATM.check() ==1)
+  if (introFrame < INTRO_FRAMES) arduboyIntro(introFrame);   // the ARDUBOY letters land on the notes ...
+  else
   {
-    playMenuMusic();
-    statePrepForMainMenu();
+    if (introFrame == INTRO_FRAMES) playMenuMusic();         // ... the title song starts with the T-arg logo
+    sprites.drawSelfMasked(49, 20, T_arg, 0);
+    if (introFrame > INTRO_FRAMES + 52) statePrepForMainMenu();
   }
-  sprites.drawSelfMasked(49, 20, T_arg, 0);
+  introFrame++;
 }
 
 void stateMenuMain()
@@ -74,13 +84,13 @@ void stateMenuMain()
 
   if (ATM.check()== 2) danceDroid = !danceDroid;
 
-  sprites.drawPlusMask(51, 9+SET_THE_DANCERS_Y, droid_plus_mask, 2+danceDroid);
+  drawFlip(51, 9+SET_THE_DANCERS_Y, droid_plus_mask, 2+danceDroid);
 
   // drawing the 4 enemies on the title screen a loop is not saving memory
-  sprites.drawPlusMask(75, 21+SET_THE_DANCERS_Y, enemies_plus_mask, 2+danceDroid);
-  sprites.drawPlusMask(27, 21+SET_THE_DANCERS_Y, enemies_plus_mask, 6+danceDroid);
-  sprites.drawPlusMask(99, 33+SET_THE_DANCERS_Y, enemies_plus_mask, 10+danceDroid);
-  sprites.drawPlusMask(3, 33+SET_THE_DANCERS_Y, enemies_plus_mask, 14+danceDroid);
+  drawFlip(75, 21+SET_THE_DANCERS_Y, enemies_plus_mask, 2+danceDroid);
+  drawFlip(27, 21+SET_THE_DANCERS_Y, enemies_plus_mask, 6+danceDroid);
+  drawFlip(99, 33+SET_THE_DANCERS_Y, enemies_plus_mask, 10+danceDroid);
+  drawFlip(3, 33+SET_THE_DANCERS_Y, enemies_plus_mask, 14+danceDroid);
 
 
 

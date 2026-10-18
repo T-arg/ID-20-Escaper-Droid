@@ -147,23 +147,15 @@ const unsigned char * const PROGMEM soundFX[] =
   sfxDoorClosed, pickUp, menuClick, shootBullet, levelUp, beamMeUpScotty, youHurtMe, useSwitch, killTheEnemy, clearThePiramide, openTheDoor, kickBlock
 };
 
-const uint8_t intro[] PROGMEM = {
-  ATM_SET_TEMPO(30),
-  ATM_DELAY(16),
-  ATM_VOL(63),
-  ATM_SL_VOL(-8),
-  ATM_ARP(0B01010011,0B00100001),
-  ATM_NOTE_D6,
-  ATM_DELAY(12),
-  ATM_NOTE_D6,
-  ATM_DELAY(10),
-  ATM_NOTE_D6,
-  ATM_DELAY(4),
-  ATM_NOTE_A5,
-  ATM_DELAY(32),
-  ATM_CUE(1),
-  ATM_STOP_CHAN,
+// an EMPTY song: it keeps the ATMlib playroutine running before the title song starts, so that the
+// ARDUBOY intro tune (arduboy_intro.h, a sound effect) behaves. All four channels play the same silent loop.
+const uint8_t silentSong[] PROGMEM = {
+  0x01,                         // Number of tracks
+  0x00, 0x00,                   // Address of track 0
+  0x00, 0x00, 0x00, 0x00,       // entry track of channels 0..3
+  ATM_VOL(0),
+  ATM_DELAY(64),
+  ATM_GOTO(0)
 };
-
 
 #endif

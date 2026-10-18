@@ -210,11 +210,7 @@ void stateGameFinished()
 void stateGameTransporting()
 {
   playerTransporting();
-  drawWalls();
-  drawFloor();
-  drawHUD();
-  drawPlayer();
-  if (arduboy.everyXFrames(90))
+  if (player.transportTimer == TRANSPORT_SWITCH_TIME)
   {
     currentRoom = transportToRoom(currentRoom);
     player.x = translateTileToX (player.isOnTile) ;
@@ -222,6 +218,9 @@ void stateGameTransporting()
     player.steps = 0;
     enterRoom(currentRoom);
   }
+  checkOrderOfObjects();
+  drawRoom();
+  drawHUD();
 }
 
 

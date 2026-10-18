@@ -72,7 +72,7 @@ void drawEnemies(bool i)
                          12 + elements[i].frame);
   }
   else
-    sprites.drawPlusMask(elements[i].x, elements[i].y + currentRoomY, enemies_plus_mask,
+    drawFlip(elements[i].x, elements[i].y + currentRoomY, enemies_plus_mask,
                          ((ch & 7) << 2) | ((ch & 0b00011000) >> 3));
 }
 

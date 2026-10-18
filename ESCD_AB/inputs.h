@@ -49,7 +49,53 @@ void checkInputs()
   }
 
   if (arduboy.justPressed(B_BUTTON))
+  {
+    byte dir = player.characteristics & 0b00000011;
+    byte objType = elements[OBJECT].characteristics & 0b00000111;
+    byte objTile = (elements[OBJECT].characteristics & 0b11111000) >> 3;
+    int8_t neededTile = player.isOnTile + (int8_t)pgm_read_byte(&dirTileOffset[dir]);
+
+    // 1. move block
+    byte occ = 255;
+    if (neededTile >= 0 && neededTile < 25)
+      occ = itemsOrder[neededTile + ITEMS_ORDER_TILES_START];
+    if (occ >= FLOOR_ONE && occ <= FLOOR_FIVE && floorKind(occ) == FLOOR_BOX)
     {
+      tryPushBox(occ, dir);
+      return;
+    }
+
+    if (objTile == neededTile)
+    {
+      // 2. transport
+      if (objType == TELEPORT)
+      {
+        bitSet(player.characteristics, DROID_TRANSPORTING_AT_BIT_7);
+        gameState = STATE_GAME_TRANSPORTING;
+        play_SFX(SFX_BEAMMEUPSCOTTY);
+        return;
+      }
+      // 3. switch
+      if (objType > 5)
+      {
+        bitToggle(elements[OBJECT].characteristics, 0);
+        bitToggle(stageRoom[currentRoom].roomNumberInfluencing, 7);
+        byte targetRoom = stageRoom[currentRoom].roomNumberInfluencing & 0b00111111;
+        byte mask       = stageRoom[currentRoom].elementsInfluenced;
+        stageRoom[targetRoom].elementsActive ^= mask;
+        play_SFX(SFX_SWITCH);
+        return;
+      }
+    }
+
+    // 4. open door
+    if (player.isOnTile == pgm_read_byte(&doorFrontTile[dir]))
+    {
+      playerChecksAndOpensDoor(dir);
+      return;
+    }
+
+    // 5. next level (the shot below is the fallback, so this has to come before it)
     bool onExitDecal = false;
     for (byte f = FLOOR_ONE; f <= FLOOR_FIVE; f++)
     {
@@ -65,48 +111,8 @@ void checkInputs()
       return;
     }
 
-    byte dir = player.characteristics & 0b00000011;
-
-    if (player.isOnTile == pgm_read_byte(&doorFrontTile[dir]))
-      playerChecksAndOpensDoor(dir);
-
-    byte objType = elements[OBJECT].characteristics & 0b00000111;
-    byte objTile = (elements[OBJECT].characteristics & 0b11111000) >> 3;
-    int8_t neededTile = player.isOnTile + (int8_t)pgm_read_byte(&dirTileOffset[dir]);
-
-    bool usedAction = (player.isOnTile == pgm_read_byte(&doorFrontTile[dir]));
-
-    if (objTile == neededTile)
-    {
-      if (objType == TELEPORT)
-      {
-        bitSet(player.characteristics, DROID_TRANSPORTING_AT_BIT_7);
-        gameState = STATE_GAME_TRANSPORTING;
-        usedAction = true;
-        play_SFX(SFX_BEAMMEUPSCOTTY);
-      }
-      else if (objType > 5)
-      {
-        bitToggle(elements[OBJECT].characteristics, 0);
-        bitToggle(stageRoom[currentRoom].roomNumberInfluencing, 7);
-        byte targetRoom = stageRoom[currentRoom].roomNumberInfluencing & 0b00111111;
-        byte mask       = stageRoom[currentRoom].elementsInfluenced;
-        stageRoom[targetRoom].elementsActive ^= mask;
-        usedAction = true;
-        play_SFX(SFX_SWITCH);
-      }
-    }
-
-    if (!usedAction)
-    {
-      byte occ = 255;
-      if (neededTile >= 0 && neededTile < 25)
-        occ = itemsOrder[neededTile + ITEMS_ORDER_TILES_START];
-      if (occ >= FLOOR_ONE && occ <= FLOOR_FIVE && floorKind(occ) == FLOOR_BOX)
-        tryPushBox(occ, dir);
-      else
-        spawnPlayerShot();
-    }
+    // 6. shoot
+    spawnPlayerShot();
   }
 }
 

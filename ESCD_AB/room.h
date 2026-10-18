@@ -462,9 +462,9 @@ void drawDoorPiece(byte id)
   if (part == 1) bmp = doorPostBig_plus_mask;
   else if (part == 2) bmp = doorPostSmall_plus_mask;
   else if (part == 3) bmp = doorClossed_plus_mask;
-  sprites.drawPlusMask(x, y, bmp, dir);
+  drawFlip(x, y, bmp, dir);
   if (part == 3 && checkIfLevelDoor() == dir)
-    sprites.drawPlusMask(x, y + 1, bmp, dir);   // level door drawn twice
+    drawFlip(x, y + 1, bmp, dir);   // level door drawn twice
 }
 
 
@@ -492,6 +492,11 @@ void drawRoom()
   drawFloor();
   for (byte i = 0; i < SIZE_OF_ITEMSORDER; i++)
   {
+    if (i == ITEMS_ORDER_TILES_START + 25)   // after the floor tiles, before the S and W doors: shots fly behind those posts
+    {
+      drawBulletPlayer();
+      drawBulletEnemy();
+    }
     byte id = itemsOrder[i];
     if (id == EMPTY_PLACE) continue;
     if (id <= ENEMY_TWO)         drawEnemies(id);
@@ -500,8 +505,6 @@ void drawRoom()
     else if (id == PLAYER_DROID) drawPlayer();
     else if (id >= NORTH_LINTEL && id <= WEST_DOOR_CLOSSED) drawDoorPiece(id);
   }
-  drawBulletPlayer();
-  drawBulletEnemy();
 }
 
 
