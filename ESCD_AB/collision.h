@@ -245,7 +245,11 @@ bool kickPlayer(byte dir)
   else if (occ != EMPTY_PLACE && !foe) return false;
 
   player.isOnTile = dest;
-  currentRoomY = setCurrentRoomY(dest);
+  for (byte i = 0; i < 6; i++)   // the screen scrolls like it does when walking: 6 steps make one tile
+  {
+    if (dir > EAST) { if (currentRoomY > MAX_ROOM_Y_SCROLLING) currentRoomY--; }
+    else if (currentRoomY < 0) currentRoomY++;
+  }
   player.x = translateTileToX(dest);
   player.y = translateTileToY(dest) + currentRoomY;
   play_SFX(SFX_KICK);          // played first so the hurt sound takes over if the shove lands on a foe or spikes
