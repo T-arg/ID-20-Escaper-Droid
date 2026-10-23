@@ -57,9 +57,9 @@ PROGMEM const unsigned char font[] =
 0B00000000,
 0B00001010,
 0B00000000,
-// ;  -  ASCII DEC 59 ; HEX 3B
+// .  -  stored in the unused ';' slot (ASCII DEC 59 ; HEX 3B), loadAndFillMessage() maps '.' to ';'
+0B00000000,
 0B00010000,
-0B00001010,
 0B00000000,
 // <  -  ASCII DEC 60 ; HEX 3C
 0B00000100,
@@ -77,10 +77,10 @@ PROGMEM const unsigned char font[] =
 0B00000001,
 0B00010101,
 0B00000010,
-// @  -  ASCII DEC 64 ; HEX 40
-0B00001110,
-0B00010111,
-0B00010110,
+// -  -  stored in the unused '@' slot (ASCII DEC 64 ; HEX 40), loadAndFillMessage() maps '-' to '@'
+0B00000100,
+0B00000100,
+0B00000100,
 // A  -  ASCII DEC 65 ; HEX 41 
 0B00011111,
 0B00000101,

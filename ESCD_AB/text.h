@@ -39,7 +39,7 @@ PROGMEM const char textMessage[] = // each message max 30 characters including s
   "    CONF SDFX   INFO PLAY\0"         //00
   " BUTTON SCHEME    N<>S  E<>W\0"      //01
   "    MSFX MUSC   SDFX MUTE\0"         //02
-  " CREATED BY STG ONEBIT JO3RI\0"      //03
+  "MADE BY JO3RI T-ARG.GITHUB.IO \0"    //03
   " CONTINUE GAME    NEW   CONT\0"      //04
   "   LEVEL         SCORE:\0"           //05
   "GAME OVER  :<  SCORE:\0"             //06
@@ -77,6 +77,8 @@ void loadAndFillMessage(uint8_t indexMessage)
   {
     char c = pgm_read_byte(msg++);
     if (c == 0) break;   // end of string
+    if (c == '.') c = ';';   // '.' glyph lives in the unused ';' font slot (no extra flash)
+    else if (c == '-') c = '@';   // '-' glyph lives in the unused '@' font slot
 
     uint8_t idx = c - FONT_OFFSET;
     if (idx != 240)              // space → leave zeros = frame 0 blank
