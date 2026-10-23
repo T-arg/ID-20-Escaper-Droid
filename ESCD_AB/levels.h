@@ -281,6 +281,30 @@ const unsigned char PROGMEM level05[] =
 const unsigned char PROGMEM level06[] =
 {
   4,          // amount of rooms
+  0,          // amount of transporters
+  1,          // amount of rooms with influenceable objects
+
+  0b00001001,  // ROOM AND DOOR LEADING TO NEXT LEVEL ROOM
+  0b00000011,  // NEXT LEVEL ROOM
+
+//DOOR+STATE  NORTH GOTO  EAST  GOTO  SOUTH GOTO  WEST  GOTO   ENEMY 1      ENEMY 2    OBJECT 3     FLOOR 1     FLOOR 2     FLOOR 3     FLOOR 4     FLOOR 5
+  0b00100000, 0b00000000, 0b00000111, 0b00000000, 0b00000000, 0b11000010, 0b00000000, 0b00100000, 0b10011001, 0b01101001, 0b00111001, 0b01000100, 0b00001001, // room0 BLACK CARD t4
+  0b11000000, 0b00000000, 0b00000000, 0b00001000, 0b00000001, 0b11000000, 0b00000000, 0b00110110, 0b01010011, 0b01011011, 0b00111011, 0b00010011, 0b01100010, // room1 SWITCH OFF t6
+  0b00110010, 0b00000110, 0b00001111, 0b00000000, 0b00000000, 0b11000011, 0b00000000, 0b01100011, 0b00111100, 0b01011100, 0b01101100, 0b10001001, 0b00000000, // room2 BULLET t12
+  0b10000000, 0b00000000, 0b00000000, 0b00000000, 0b00001001, 0b00010001, 0b00000000, 0b10110100, 0b10111011, 0b10101011, 0b00001011, 0b00011011, 0b10001011, // room3 CHIP t22
+
+  // transporters
+
+  // influence
+  0b00000000, 0b00000010, // I0
+};
+// LAYOUT 0:40,40 1:180,40 2:180,180 3:320,180
+// INF 1>0 F4
+
+
+const unsigned char PROGMEM level07[] =
+{
+  4,          // amount of rooms
   1,          // amount of transporters
   1,          // amount of rooms with influenceable objects
 
@@ -303,7 +327,7 @@ const unsigned char PROGMEM level06[] =
 // INF 1>0 F3
 
 
-const unsigned char PROGMEM level07[] =
+const unsigned char PROGMEM level08[] =
 {
   5,          // amount of rooms
   0,          // amount of transporters
@@ -327,7 +351,7 @@ const unsigned char PROGMEM level07[] =
 // LAYOUT 0:40,180 1:180,180 2:320,180 3:180,40 4:180,320
 // INF 2>1 F1
 
-const unsigned char PROGMEM level08[] =
+const unsigned char PROGMEM level09[] =
 {
   5,          // amount of rooms
   0,          // amount of transporters
@@ -351,7 +375,7 @@ const unsigned char PROGMEM level08[] =
 // LAYOUT 0:320,180 1:320,40 2:180,40 3:460,40 4:460,180
 // INF 4>1 F2 F3
 
-const unsigned char PROGMEM level09[] =
+const unsigned char PROGMEM level10[] =
 {
   5,          // amount of rooms
   0,          // amount of transporters
@@ -375,7 +399,7 @@ const unsigned char PROGMEM level09[] =
 // LAYOUT 0:40,40 1:180,40 2:320,40 3:460,40 4:600,40
 // INF 2>0 F1 F2
 
-const unsigned char PROGMEM level10[] =
+const unsigned char PROGMEM level11[] =
 {
   6,          // amount of rooms
   1,          // amount of transporters
@@ -402,7 +426,7 @@ const unsigned char PROGMEM level10[] =
 // LAYOUT 0:180,40 1:180,180 2:320,180 3:460,180 4:460,40 5:320,40
 // INF 1>2 F3 F4 F5  2>4 F2 F3
 
-const unsigned char PROGMEM level11[] =
+const unsigned char PROGMEM level12[] =
 {
   6,          // amount of rooms
   1,          // amount of transporters
@@ -430,7 +454,7 @@ const unsigned char PROGMEM level11[] =
 // INF 2>1 F1  4>3 F3
 
 
-const unsigned char PROGMEM level12[] =
+const unsigned char PROGMEM level13[] =
 {
   8,          // amount of rooms
   2,          // amount of transporters
@@ -460,7 +484,7 @@ const unsigned char PROGMEM level12[] =
 // LAYOUT 0:40,40 1:40,180 2:180,460 3:40,320 4:180,320 5:320,320 6:320,180 7:320,40
 // INF 3>5 F1 F2 F4  4>3 F4 F5
 
-const unsigned char PROGMEM level13[] =
+const unsigned char PROGMEM level14[] =
 {
   9,          // amount of rooms
   1,          // amount of transporters
@@ -493,7 +517,7 @@ const unsigned char PROGMEM level13[] =
 
 
 
-const unsigned char PROGMEM level14[] =
+const unsigned char PROGMEM level15[] =
 {
   9,          // amount of rooms
   2,          // amount of transporters
@@ -525,7 +549,7 @@ const unsigned char PROGMEM level14[] =
 
 
 
-const unsigned char PROGMEM level15[] =
+const unsigned char PROGMEM level16[] =
 {
   9,          // amount of rooms
   1,          // amount of transporters
@@ -557,7 +581,7 @@ const unsigned char PROGMEM level15[] =
 // INF 5>6 F1 F2 F3 F4 F5  6>4 F3  7>3 F3
 
 
-const unsigned char PROGMEM level16[] =
+const unsigned char PROGMEM level17[] =
 {
   9,          // amount of rooms
   1,          // amount of transporters
@@ -588,7 +612,7 @@ const unsigned char PROGMEM level16[] =
 // LAYOUT 0:200,40 1:340,40 2:480,40 3:620,40 4:760,40 5:900,40 6:1040,40 7:1180,40 8:60,40
 // INF 2>0 F1  3>8 F5  7>0 F1 F2 F3
 
-const unsigned char PROGMEM level17[] =
+const unsigned char PROGMEM level18[] =
 {
   12,          // amount of rooms
   4,          // amount of transporters
@@ -745,7 +769,7 @@ const unsigned char PROGMEM levelFinal[] =
 // pointer table in flash too — 2 bytes per level, no SRAM copy
 const unsigned char * const PROGMEM levels[] =
 {
-  level01, level02, level03, level04, level05, level06, level07, level08, level09, level10, level11, level12, level13, level14, level15, level16, level17, levelSemiFinal, levelFinal,
+  level01, level02, level03, level04, level05, level06, level07, level08, level09, level10, level11, level12, level13, level14, level15, level16, level17, level18, levelSemiFinal, levelFinal,
 };
 
 #define AMOUNT_OF_LEVELS  (sizeof(levels) / sizeof(levels[0]))
