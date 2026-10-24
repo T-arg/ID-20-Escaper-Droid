@@ -183,9 +183,9 @@ void checkObjectTypeAndAct()
       clearElement();
       break;
     case PICKUP_BULLET:
-      play_SFX(SFX_PICKUP);
       if ((player.assets & 0b00000111) < 0b00000111)
       {
+        play_SFX(SFX_PICKUP);   // only when really picked up (full ammo: no sound, no score)
         player.assets++;
         objectHiddenThisVisit = true;   // gone until you leave the room
         scorePlayer += SCORE_BULLET;
