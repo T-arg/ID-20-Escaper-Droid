@@ -179,7 +179,7 @@ void stateGamePause()
       musicPending = FALSE;
       playGameMusic();
     }
-    else if (soundMode < 2) ATM.resume();   // back from the pause in the game (SFX only: score stays frozen)
+    else if (soundMode < 2) unpauseMusic();   // back from the pause in the game: lead, chords and drums come back on the beat (SFX only: no music)
     statePrepForRoom();
   }
 }

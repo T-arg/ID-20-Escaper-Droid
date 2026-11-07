@@ -147,6 +147,26 @@ void drawFlip(int x, int y, const unsigned char *bmp, byte f)
     }
 }
 
+// pause in the game: the song keeps running on its clock, only the bass (channel 2) is heard. Lead (0), chords (1) and drums (3) are muted.
+// (SFX only mode has no music: the score is already frozen by ATM.pause())
+void pauseMusic()
+{
+  if (soundMode >= 2) return;
+  ATM.muteChannel(0);
+  ATM.muteChannel(1);
+  ATM.muteChannel(3);
+  osc[0].vol = 0;              // (a muted channel is just not updated any more: it would go on sounding its last note, so silence it)
+  osc[1].vol = 0;
+  osc[3].vol = 0;
+}
+
+void unpauseMusic()
+{
+  ATM.unMuteChannel(0);
+  ATM.unMuteChannel(1);
+  ATM.unMuteChannel(3);
+}
+
 void playMenuMusic()
 {
   ATM.play(titleSong);

@@ -44,7 +44,7 @@ void checkInputs()
   if (arduboy.justPressed(A_BUTTON))
   {
     statePrepForPause();
-    ATM.pause();
+    pauseMusic();                // only the bass keeps playing
     gameState = STATE_GAME_PAUSE;
   }
 

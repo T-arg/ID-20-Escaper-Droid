@@ -109,10 +109,10 @@
 #define ATM_FUNC_PLAYPAUSE 1  // ATM.playPause() — needs PAUSE and RESUME
 #endif
 #ifndef ATM_FUNC_MUTE
-#define ATM_FUNC_MUTE 0       // ATM.muteChannel()
+#define ATM_FUNC_MUTE 1       // ATM.muteChannel()
 #endif
 #ifndef ATM_FUNC_UNMUTE
-#define ATM_FUNC_UNMUTE 0     // ATM.unMuteChannel()
+#define ATM_FUNC_UNMUTE 1     // ATM.unMuteChannel()
 #endif
 #ifndef ATM_FUNC_SFX
 #define ATM_FUNC_SFX 1        // ATM.playSfx()
